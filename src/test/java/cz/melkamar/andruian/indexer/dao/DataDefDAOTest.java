@@ -44,7 +44,7 @@ public class DataDefDAOTest {
                 .expect(MockRestRequestMatchers.requestTo(testUri))
                 .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));
 
-        DataDef dataDef = dataDefDAO.getDataDef(testUri);
+        DataDef dataDef = dataDefDAO.getDataDefFromUri(testUri);
         assertEquals("http://foo/dataDef", dataDef.getUri());
     }
 

@@ -20,7 +20,7 @@ public class AdminEndpoint {
     @RequestMapping("reindex")
     public String reindex(@RequestParam(value = "dataDefUri", required = false, defaultValue = "") String dataDefUri) {
         if (dataDefUri != null && dataDefUri.length() > 0) {
-            DataDef dataDef = dataDefDAO.getDataDef(dataDefUri);
+            DataDef dataDef = dataDefDAO.getDataDefFromUri(dataDefUri);
             indexService.indexDataDef(dataDef);
             return "Refreshing " + dataDefUri;
         } else {

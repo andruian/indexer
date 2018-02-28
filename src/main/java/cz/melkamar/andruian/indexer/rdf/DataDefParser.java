@@ -38,11 +38,9 @@ public class DataDefParser {
             DataClassDef dataClassDef = parseDataClassDef(dataClassDefResource);
 
             DataDef dataDef = new DataDef(dataDefResource.getURI(), locationDef, dataClassDef);
-
-            LOGGER.debug("dataDef:      {}", dataDef);
+            LOGGER.debug("Parsed dataDef: {}", dataDef);
             return dataDef; // todo this should be better
         }
-        System.out.println("done");
         return null;
     }
 
@@ -53,8 +51,6 @@ public class DataDefParser {
      * @return
      */
     public DataClassDef parseDataClassDef(Resource dataClassDefResource) {
-        LOGGER.debug("parseDataClassDef: {}", dataClassDefResource);
-
         String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
                 .getResource()
                 .toString();
@@ -70,10 +66,6 @@ public class DataDefParser {
 
 
         DataClassDef dataClassDef = new DataClassDef(sparqlEndpointURI, classURI, propertyPath, selectProperties);
-
-
-        LOGGER.debug("sparqlUri:    {}", sparqlEndpointURI);
-        LOGGER.debug("classUri:     {}", classURI);
         return dataClassDef;
     }
 
@@ -129,8 +121,6 @@ public class DataDefParser {
     }
 
     public String getResourceType(Resource resource) {
-        StmtIterator iterator = resource.listProperties();
-        while (iterator.hasNext()) System.out.println(iterator.nextStatement());
         Statement statement = resource.getProperty(new PropertyImpl(URIs.RDF.type));
         if (statement == null) return null;
         return statement.getResource().toString();

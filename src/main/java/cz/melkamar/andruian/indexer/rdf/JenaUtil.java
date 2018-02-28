@@ -13,7 +13,7 @@ public class JenaUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JenaUtil.class);
 
     public static Model modelFromString(String rdf) {
-        JenaUtil.LOGGER.debug("Model from string: {}", rdf);
+        JenaUtil.LOGGER.trace("Model from string: {}", rdf);
 
         Model model = ModelFactory.createDefaultModel();
         try {

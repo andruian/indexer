@@ -16,7 +16,7 @@ public class DataDefDAO {
     @Autowired
     private RestTemplate restTemplate;
 
-    public DataDef getDataDef(String uri) {
+    public DataDef getDataDefFromUri(String uri) {
         LOGGER.info("Fetching DataDef from {}", uri);
 
         String payload = restTemplate.getForObject(uri, String.class);
