@@ -1,0 +1,42 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.10.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework:springloaded:1.2.6.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+group = 'cz.melkamar.andruian'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file("$buildDir/classes/main/")
+    }
+}
+
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-configuration-processor")
+    compile("org.springframework.boot:spring-boot-devtools")
+    // https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs
+    compile group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.6.0'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
