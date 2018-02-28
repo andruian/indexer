@@ -9,7 +9,6 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -116,15 +115,15 @@ public class DataDefParser {
                 .getResource()
                 .toString();
 
-        Map<String, LocationClassToPropPath> locPathsMap = new HashMap<>();
+        Map<String, ClassToCoordPropPath> locPathsMap = new HashMap<>();
         StmtIterator pathDefs = locationDef.listProperties(new PropertyImpl(URIs.ANDR.classToLocPath));
         while (pathDefs.hasNext()) {
             Resource pathDef = pathDefs.nextStatement().getResource();
             String pdClass = pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._class)).toString();
             PropertyPath latPath = parsePropertyPath(pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.lat)));
             PropertyPath longPath = parsePropertyPath(pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._long)));
-            LocationClassToPropPath locationClassToPropPath = new LocationClassToPropPath(latPath, longPath, pdClass);
-            locPathsMap.put(pdClass, locationClassToPropPath);
+            ClassToCoordPropPath classToCoordPropPath = new ClassToCoordPropPath(latPath, longPath, pdClass);
+            locPathsMap.put(pdClass, classToCoordPropPath);
         }
         return new LocationDef(sparqlEndpoint, locClass, locPathsMap);
     }

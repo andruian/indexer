@@ -1,11 +1,11 @@
 package cz.melkamar.andruian.indexer.model.datadef;
 
-public class LocationClassToPropPath {
+public class ClassToCoordPropPath {
     private final PropertyPath latCoord;
     private final PropertyPath longCoord;
     private final String forClassUri;
 
-    public LocationClassToPropPath(PropertyPath latCoord, PropertyPath longCoord, String forClassUri) {
+    public ClassToCoordPropPath(PropertyPath latCoord, PropertyPath longCoord, String forClassUri) {
         this.latCoord = latCoord;
         this.longCoord = longCoord;
         this.forClassUri = forClassUri;
