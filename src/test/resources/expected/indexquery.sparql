@@ -6,7 +6,7 @@ prefix ruian: <http://ruian.linked.opendata.cz/ontology/>
 prefix s: <http://schema.org/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
-SELECT distinct ?dataObj ?locationObj ?lat ?long ?selectA ?selectB
+SELECT distinct ?dataObj ?locationObj ?lat ?long ?selectA ?selectB 
 WHERE {
   ?dataObj a <[dataclassuri]>;
          <a>/<b>/<c> ?locationObj;
