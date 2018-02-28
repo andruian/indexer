@@ -28,7 +28,16 @@
                              ];
     andr:selectProperty [ a andr:SelectProperty;
                           s:name "foobar";
-                          sp:predicate ex:id
+                          sp:path [ a        sp:SeqPath;
+                                    sp:path1 ex:id
+                                  ];
+                        ];
+    andr:selectProperty [ a andr:SelectProperty;
+                          s:name "another";
+                          sp:path [ a        sp:SeqPath;
+                                    sp:path1 ex:abc;
+                                    sp:path2 ex:def;
+                                  ];
                         ];
     .
 

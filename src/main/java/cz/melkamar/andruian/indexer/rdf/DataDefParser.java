@@ -2,10 +2,7 @@ package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.dao.DataDefDAO;
 import cz.melkamar.andruian.indexer.exception.NotImplementedException;
-import cz.melkamar.andruian.indexer.model.datadef.DataClassDef;
-import cz.melkamar.andruian.indexer.model.datadef.DataDef;
-import cz.melkamar.andruian.indexer.model.datadef.LocationDef;
-import cz.melkamar.andruian.indexer.model.datadef.PropertyPath;
+import cz.melkamar.andruian.indexer.model.datadef.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
@@ -25,9 +22,9 @@ public class DataDefParser {
     }
 
     public DataDef parse() {
-        String dataDefClassURI = Prefix.andr + "DataDef";
+        String dataDefClassURI = ANDR.DataDef;
 
-        ResIterator iter = model.listSubjectsWithProperty(new PropertyImpl(Prefix.rdf + "type"),
+        ResIterator iter = model.listSubjectsWithProperty(new PropertyImpl(RDF.type),
                                                           new ResourceImpl(dataDefClassURI));
         while (iter.hasNext()) {
             Resource dataDefResource = iter.next();
@@ -51,25 +48,52 @@ public class DataDefParser {
     private DataClassDef parseDataClassDef(Resource dataDef) {
         LOGGER.debug("parseDataClassDef: {}", dataDef);
 
-        Resource dataClassDefResource = dataDef.getProperty(new PropertyImpl(URI_ANDR_PROP_DATA_CLASS_DEF))
+        Resource dataClassDefResource = dataDef.getProperty(new PropertyImpl(ANDR.dataClassDef))
                 .getResource();
 
-        String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(URI_ANDR_PROP_SPARQL_ENDPOINT))
+        String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(ANDR.sparqlEndpoint))
                 .getResource()
                 .toString();
 
-        String classURI = dataClassDefResource.getProperty(new PropertyImpl(URI_ANDR_PROP_CLASS))
+        String classURI = dataClassDefResource.getProperty(new PropertyImpl(ANDR._class))
                 .getResource()
                 .toString();
+
+        SelectProperty[] selectProperties = parseSelectProperties(dataClassDefResource);
 
         PropertyPath propertyPath = parsePropertyPath(dataClassDefResource.getPropertyResourceValue(new PropertyImpl(
-                URI_ANDR_PROP_PATH_TO_LOC)));
+                ANDR.pathToLocationClass)));
 
-        DataClassDef dataClassDef = new DataClassDef(sparqlEndpointURI, classURI, propertyPath);
+
+        DataClassDef dataClassDef = new DataClassDef(sparqlEndpointURI, classURI, propertyPath, selectProperties);
+
 
         LOGGER.debug("sparqlUri:    {}", sparqlEndpointURI);
         LOGGER.debug("classUri:     {}", classURI);
         return dataClassDef;
+    }
+
+    /**
+     * Parse all andr:selectProperty of a given dataClassDef JENA resource.
+     *
+     * @param dataClassDef
+     * @return
+     */
+    private SelectProperty[] parseSelectProperties(Resource dataClassDef) {
+        StmtIterator iterator = dataClassDef.listProperties(new PropertyImpl(ANDR.selectProperty));
+        List<SelectProperty> properties = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Resource selectPropertyResource = iterator.nextStatement().getResource();
+            String name = selectPropertyResource.getProperty(new PropertyImpl(Prefix.s + "name")).getLiteral()
+                    .toString();
+
+            Resource pathResource = selectPropertyResource.getPropertyResourceValue(new PropertyImpl(SP.path));
+            PropertyPath propertyPath = parsePropertyPath(pathResource);
+
+            properties.add(new SelectProperty(name, propertyPath));
+        }
+
+        return properties.toArray(new SelectProperty[properties.size()]);
     }
 
     private LocationDef parseLocationDef(Resource dataDef) {
@@ -93,16 +117,16 @@ public class DataDefParser {
      */
     private PropertyPath parsePropertyPath(Resource seqPath) {
         String type = getResourceType(seqPath);
-        if (!type.equals(Prefix.sp + "SeqPath")) {
+        if (!type.equals(SP.SeqPath)) {
             throw new NotImplementedException("PropertyPath type " + type + " not implemented yet.");
         }
 
         List<String> pathParts = new ArrayList<>();
         while (true) {
-            String part1 = seqPath.getPropertyResourceValue(new PropertyImpl(Prefix.sp + "path1")).toString();
+            String part1 = seqPath.getPropertyResourceValue(new PropertyImpl(SP.path1)).toString();
             pathParts.add(part1);
 
-            Resource part2 = seqPath.getPropertyResourceValue(new PropertyImpl(Prefix.sp + "path2"));
+            Resource part2 = seqPath.getPropertyResourceValue(new PropertyImpl(SP.path2));
             if (part2 == null) { // If no part2, just ignore it
                 break;
             } else {
@@ -110,7 +134,7 @@ public class DataDefParser {
                 if (part2type == null) {
                     pathParts.add(part2.toString());
                     break;
-                } else if (part2type.equals(Prefix.sp + "SeqPath")) {
+                } else if (part2type.equals(SP.SeqPath)) {
                     seqPath = part2;
                 } else {
                     throw new NotImplementedException("Unknown path2 type " + part2type);
@@ -121,15 +145,9 @@ public class DataDefParser {
         return new PropertyPath(pathParts.toArray(new String[pathParts.size()]));
     }
 
-    public final static String URI_ANDR_PROP_DATA_CLASS_DEF = Prefix.andr + "dataClassDef";
-    public final static String URI_ANDR_PROP_SPARQL_ENDPOINT = Prefix.andr + "sparqlEndpoint";
-    public final static String URI_ANDR_PROP_CLASS = Prefix.andr + "class";
-    public final static String URI_ANDR_PROP_PATH_TO_LOC = Prefix.andr + "pathToLocationClass";
-    public final static String URI_ANDR_CLASS_DATA_CLASS_DEF = Prefix.andr + "DataClassDef";
-
     public final static String URI_RDF_TYPE = Prefix.rdf + "type";
 
-    static class Prefix {
+    public static class Prefix {
         public final static String andr = "http://example.andruian.com/ontology/";
         public final static String rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
         public final static String ruian = "http://ruian.linked.opendata.cz/ontology/";
@@ -137,5 +155,26 @@ public class DataDefParser {
         public final static String s = "http://schema.org/";
         public final static String ex = "http://example.org/";
         public final static String BLANK = "http://foo/";
+    }
+
+    public static class ANDR {
+        public final static String dataClassDef = Prefix.andr + "dataClassDef";
+        public final static String sparqlEndpoint = Prefix.andr + "sparqlEndpoint";
+        public final static String _class = Prefix.andr + "class";
+        public final static String pathToLocationClass = Prefix.andr + "pathToLocationClass";
+        public final static String selectProperty = Prefix.andr + "selectProperty";
+        public final static String DataClassDef = Prefix.andr + "DataClassDef";
+        public final static String DataDef = Prefix.andr + "DataDef";
+    }
+
+    public static class SP {
+        public final static String path = Prefix.sp + "path";
+        public final static String path1 = Prefix.sp + "path1";
+        public final static String path2 = Prefix.sp + "path2";
+        public final static String SeqPath = Prefix.sp + "SeqPath";
+    }
+
+    public static class RDF {
+        public final static String type = Prefix.rdf + "type";
     }
 }
