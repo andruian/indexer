@@ -1,28 +1,29 @@
 package cz.melkamar.andruian.indexer.model.place;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class Place {
-    private double latPos;
-    private double longPos;
-    private String uri;
-    private String classUri;
-    private String locationObjectUri;
-    private List<Property> properties;
+    private final double latPos;
+    private final double longPos;
+    private final String uri;
+    private final String classUri;
+    private final String locationObjectUri;
+    private final Property[] properties;
 
-    public Place(double latPos, double longPos, String uri, String classUri, String locationObjectUri) {
+    public Place(double latPos,
+                 double longPos,
+                 String uri,
+                 String classUri,
+                 String locationObjectUri,
+                 Property[] properties) {
         this.latPos = latPos;
         this.longPos = longPos;
         this.uri = uri;
         this.classUri = classUri;
         this.locationObjectUri = locationObjectUri;
-        this.properties = new ArrayList<>();
+        this.properties = properties;
     }
 
-    public void addProperty(Property property) {
-        properties.add(property);
-    }
 
     public double getLatPos() {
         return latPos;
@@ -44,7 +45,19 @@ public class Place {
         return locationObjectUri;
     }
 
-    public List<Property> getProperties() {
+    public Property[] getProperties() {
         return properties;
+    }
+
+    @Override
+    public String toString() {
+        return "Place{" +
+                "latPos=" + latPos +
+                ", longPos=" + longPos +
+                ", uri='" + uri + '\'' +
+                ", classUri='" + classUri + '\'' +
+                ", locationObjectUri='" + locationObjectUri + '\'' +
+                ", properties=" + Arrays.toString(properties) +
+                '}';
     }
 }
