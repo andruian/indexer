@@ -30,7 +30,8 @@ public class AdminEndpoint {
         } else {
             // TODO Display GUI?
             // TODO at least list available URIs
-            return "Expected a dataDefUri parameter.";
+            indexService.reindexAll();
+            return "Refreshing all";
         }
     }
 }

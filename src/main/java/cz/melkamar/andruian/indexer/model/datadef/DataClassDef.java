@@ -23,6 +23,10 @@ public class DataClassDef extends ClassDef {
         return selectProperties;
     }
 
+    public String[] getSelectPropertiesNames() {
+        return Arrays.stream(selectProperties).map(SelectProperty::getName).toArray(String[]::new);
+    }
+
     @Override
     public String toString() {
         return "DataClassDef{" +

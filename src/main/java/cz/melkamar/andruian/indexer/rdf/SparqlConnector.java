@@ -7,10 +7,12 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class SparqlConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparqlConnector.class);
 
@@ -88,8 +90,6 @@ public class SparqlConnector {
         try {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
-                System.out.println("---------------");
-
                 QuerySolution soln = results.nextSolution();
                 resultList.add(placeFromQueryResult(soln, selectProperties));
             }

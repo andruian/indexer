@@ -118,7 +118,7 @@ public class IndexQueryBuilder extends SparqlQueryBuilder {
 
             builder.append("?dataObj ")
                     .append(selectProperty.getPath().toString())
-                    .append(" ")
+                    .append(" ?")
                     .append(selectProperty.getName())
                     .append(" .\n");
         }
