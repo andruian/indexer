@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.dao;
+package cz.melkamar.andruian.indexer.rdf;
 
 
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SparqlDAO {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlDAO.class);
+public class SparqlConnector {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlConnector.class);
 
     public static void main(String[] args) {
         String query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
@@ -72,7 +72,7 @@ public class SparqlDAO {
                 "  }\n" +
                 "}";
 
-        List<Place> places = new SparqlDAO().executeIndexQuery(query, "http://localhost:3030/test/query", new String[]{"id"});
+        List<Place> places = new SparqlConnector().executeIndexQuery(query, "http://localhost:3030/test/query", new String[]{"id"});
         for (Place place: places){
             System.out.println(place);    
         }
