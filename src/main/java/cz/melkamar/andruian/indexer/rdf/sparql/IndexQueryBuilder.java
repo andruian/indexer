@@ -68,7 +68,7 @@ public class IndexQueryBuilder extends SparqlQueryBuilder {
         argMap.put("dataClassUri", dataClassUri);
         argMap.put("pathToLocClass", dataToLocationClassPropPath.toString());
         argMap.put("locationSparqlEndpoint", locationSparqlEndpoint);
-        argMap.put("latLocationPathForLocationClass", locClassToLongPropPath.toString());
+        argMap.put("latLocationPathForLocationClass", locClassToLatPropPath.toString());
         argMap.put("longLocationPathForLocationClass", locClassToLongPropPath.toString());
         argMap.put("selectProps", buildSelectProps(selectProperties));
         argMap.put("selectPropsMapping", buildSelectPropsMapping(selectProperties));
@@ -140,10 +140,8 @@ public class IndexQueryBuilder extends SparqlQueryBuilder {
      */
     private String buildExcludeDataObjectsExpr(List<String> excludeDataObjUris) {
         StringBuilder builder = new StringBuilder();
-        for (SelectProperty selectProperty : selectProperties) {
-            checkReservedVariableUsed(selectProperty.getName());
-
-            builder.append("?dataObj != <").append(excludeDataObjUris).append("> &&\n");
+        for (String excludeUri : excludeDataObjUris) {
+            builder.append("?dataObj != <").append(excludeUri).append("> &&\n");
         }
         return builder.toString();
     }

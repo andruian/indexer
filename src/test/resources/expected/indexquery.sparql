@@ -24,8 +24,8 @@ WHERE {
   #   The reason for that is to avoid parsing error thrown by FILTER() - there must be something in the parentheses.
   #
   FILTER(
-    ?dataObj != <[[excludeA], [excludeB]]> &&
-?dataObj != <[[excludeA], [excludeB]]> &&
+    ?dataObj != <[excludeA]> &&
+?dataObj != <[excludeB]> &&
 
     True
   )
@@ -45,7 +45,7 @@ WHERE {
   #   [lat,long]LocationPathForLocationClass will contain a
   #   property path from the Location class to its coordinates.
   SERVICE <[locsparql]> {
-    ?locationObj <path>/<to>/<long> ?lat;
+    ?locationObj <path>/<to>/<lat> ?lat;
                  <path>/<to>/<long> ?long;
     .
 
