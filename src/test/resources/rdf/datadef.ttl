@@ -49,7 +49,7 @@
     a                   andr:LocationDef;
     andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
     andr:class          ruian:AdresniMisto;
-    andr:classToLocPath :classToLocPath;
+    andr:classToLocPath :adresniMistoClassToLocPath;
     .
 
 # Description of how to get from object ruian:AdresniMisto to its lat/long coordinates

@@ -9,8 +9,11 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DataDefParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDefDAO.class);
@@ -22,14 +25,19 @@ public class DataDefParser {
     }
 
     public DataDef parse() {
-        String dataDefClassURI = ANDR.DataDef;
+        String dataDefClassURI = URIs.ANDR.DataDef;
 
-        ResIterator iter = model.listSubjectsWithProperty(new PropertyImpl(RDF.type),
+        ResIterator iter = model.listSubjectsWithProperty(new PropertyImpl(URIs.RDF.type),
                                                           new ResourceImpl(dataDefClassURI));
         while (iter.hasNext()) {
             Resource dataDefResource = iter.next();
-            LocationDef locationDef = parseLocationDef(dataDefResource);
-            DataClassDef dataClassDef = parseDataClassDef(dataDefResource);
+
+            Resource locationClassDefResource = dataDefResource.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.locationDef));
+            LocationDef locationDef = parseLocationDef(locationClassDefResource);
+
+            Resource dataClassDefResource = dataDefResource.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.dataClassDef));
+            DataClassDef dataClassDef = parseDataClassDef(dataClassDefResource);
+
             DataDef dataDef = new DataDef(dataDefResource.getURI(), locationDef, dataClassDef);
 
             LOGGER.debug("dataDef:      {}", dataDef);
@@ -42,27 +50,24 @@ public class DataDefParser {
     /**
      * Create a POJO from JENA RDF Resource.
      *
-     * @param dataDef
+     * @param dataClassDefResource
      * @return
      */
-    private DataClassDef parseDataClassDef(Resource dataDef) {
-        LOGGER.debug("parseDataClassDef: {}", dataDef);
+    public DataClassDef parseDataClassDef(Resource dataClassDefResource) {
+        LOGGER.debug("parseDataClassDef: {}", dataClassDefResource);
 
-        Resource dataClassDefResource = dataDef.getProperty(new PropertyImpl(ANDR.dataClassDef))
-                .getResource();
-
-        String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(ANDR.sparqlEndpoint))
+        String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
                 .getResource()
                 .toString();
 
-        String classURI = dataClassDefResource.getProperty(new PropertyImpl(ANDR._class))
+        String classURI = dataClassDefResource.getProperty(new PropertyImpl(URIs.ANDR._class))
                 .getResource()
                 .toString();
 
         SelectProperty[] selectProperties = parseSelectProperties(dataClassDefResource);
 
         PropertyPath propertyPath = parsePropertyPath(dataClassDefResource.getPropertyResourceValue(new PropertyImpl(
-                ANDR.pathToLocationClass)));
+                URIs.ANDR.pathToLocationClass)));
 
 
         DataClassDef dataClassDef = new DataClassDef(sparqlEndpointURI, classURI, propertyPath, selectProperties);
@@ -79,15 +84,15 @@ public class DataDefParser {
      * @param dataClassDef
      * @return
      */
-    private SelectProperty[] parseSelectProperties(Resource dataClassDef) {
-        StmtIterator iterator = dataClassDef.listProperties(new PropertyImpl(ANDR.selectProperty));
+    public SelectProperty[] parseSelectProperties(Resource dataClassDef) {
+        StmtIterator iterator = dataClassDef.listProperties(new PropertyImpl(URIs.ANDR.selectProperty));
         List<SelectProperty> properties = new ArrayList<>();
         while (iterator.hasNext()) {
             Resource selectPropertyResource = iterator.nextStatement().getResource();
-            String name = selectPropertyResource.getProperty(new PropertyImpl(Prefix.s + "name")).getLiteral()
+            String name = selectPropertyResource.getProperty(new PropertyImpl(URIs.Prefix.s + "name")).getLiteral()
                     .toString();
 
-            Resource pathResource = selectPropertyResource.getPropertyResourceValue(new PropertyImpl(SP.path));
+            Resource pathResource = selectPropertyResource.getPropertyResourceValue(new PropertyImpl(URIs.SP.path));
             PropertyPath propertyPath = parsePropertyPath(pathResource);
 
             properties.add(new SelectProperty(name, propertyPath));
@@ -96,15 +101,38 @@ public class DataDefParser {
         return properties.toArray(new SelectProperty[properties.size()]);
     }
 
-    private LocationDef parseLocationDef(Resource dataDef) {
-        LOGGER.warn("Not implemented yet!");
-        return null;
+    /**
+     * Parse a LocationDef resource.
+     *
+     * @param locationDef
+     * @return
+     */
+    public LocationDef parseLocationDef(Resource locationDef) {
+        String sparqlEndpoint = locationDef.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
+                .getResource()
+                .toString();
+
+        String locClass = locationDef.getProperty(new PropertyImpl(URIs.ANDR._class))
+                .getResource()
+                .toString();
+
+        Map<String, LocationClassToPropPath> locPathsMap = new HashMap<>();
+        StmtIterator pathDefs = locationDef.listProperties(new PropertyImpl(URIs.ANDR.classToLocPath));
+        while (pathDefs.hasNext()) {
+            Resource pathDef = pathDefs.nextStatement().getResource();
+            String pdClass = pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._class)).toString();
+            PropertyPath latPath = parsePropertyPath(pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.lat)));
+            PropertyPath longPath = parsePropertyPath(pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._long)));
+            LocationClassToPropPath locationClassToPropPath = new LocationClassToPropPath(latPath, longPath, pdClass);
+            locPathsMap.put(pdClass, locationClassToPropPath);
+        }
+        return new LocationDef(sparqlEndpoint, locClass, locPathsMap);
     }
 
-    private String getResourceType(Resource resource) {
+    public String getResourceType(Resource resource) {
         StmtIterator iterator = resource.listProperties();
         while (iterator.hasNext()) System.out.println(iterator.nextStatement());
-        Statement statement = resource.getProperty(new PropertyImpl(URI_RDF_TYPE));
+        Statement statement = resource.getProperty(new PropertyImpl(URIs.RDF.type));
         if (statement == null) return null;
         return statement.getResource().toString();
     }
@@ -115,18 +143,18 @@ public class DataDefParser {
      * @param seqPath Resource of type sp:SeqPath.
      * @return
      */
-    private PropertyPath parsePropertyPath(Resource seqPath) {
+    public PropertyPath parsePropertyPath(Resource seqPath) {
         String type = getResourceType(seqPath);
-        if (!type.equals(SP.SeqPath)) {
+        if (!type.equals(URIs.SP.SeqPath)) {
             throw new NotImplementedException("PropertyPath type " + type + " not implemented yet.");
         }
 
         List<String> pathParts = new ArrayList<>();
         while (true) {
-            String part1 = seqPath.getPropertyResourceValue(new PropertyImpl(SP.path1)).toString();
+            String part1 = seqPath.getPropertyResourceValue(new PropertyImpl(URIs.SP.path1)).toString();
             pathParts.add(part1);
 
-            Resource part2 = seqPath.getPropertyResourceValue(new PropertyImpl(SP.path2));
+            Resource part2 = seqPath.getPropertyResourceValue(new PropertyImpl(URIs.SP.path2));
             if (part2 == null) { // If no part2, just ignore it
                 break;
             } else {
@@ -134,7 +162,7 @@ public class DataDefParser {
                 if (part2type == null) {
                     pathParts.add(part2.toString());
                     break;
-                } else if (part2type.equals(SP.SeqPath)) {
+                } else if (part2type.equals(URIs.SP.SeqPath)) {
                     seqPath = part2;
                 } else {
                     throw new NotImplementedException("Unknown path2 type " + part2type);
@@ -145,36 +173,4 @@ public class DataDefParser {
         return new PropertyPath(pathParts.toArray(new String[pathParts.size()]));
     }
 
-    public final static String URI_RDF_TYPE = Prefix.rdf + "type";
-
-    public static class Prefix {
-        public final static String andr = "http://example.andruian.com/ontology/";
-        public final static String rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-        public final static String ruian = "http://ruian.linked.opendata.cz/ontology/";
-        public final static String sp = "http://spinrdf.org/sp#";
-        public final static String s = "http://schema.org/";
-        public final static String ex = "http://example.org/";
-        public final static String BLANK = "http://foo/";
-    }
-
-    public static class ANDR {
-        public final static String dataClassDef = Prefix.andr + "dataClassDef";
-        public final static String sparqlEndpoint = Prefix.andr + "sparqlEndpoint";
-        public final static String _class = Prefix.andr + "class";
-        public final static String pathToLocationClass = Prefix.andr + "pathToLocationClass";
-        public final static String selectProperty = Prefix.andr + "selectProperty";
-        public final static String DataClassDef = Prefix.andr + "DataClassDef";
-        public final static String DataDef = Prefix.andr + "DataDef";
-    }
-
-    public static class SP {
-        public final static String path = Prefix.sp + "path";
-        public final static String path1 = Prefix.sp + "path1";
-        public final static String path2 = Prefix.sp + "path2";
-        public final static String SeqPath = Prefix.sp + "SeqPath";
-    }
-
-    public static class RDF {
-        public final static String type = Prefix.rdf + "type";
-    }
 }
