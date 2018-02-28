@@ -52,6 +52,7 @@ public class IndexService {
         // TODO filter out what we already have
 
         String query = queryBuilder.build();
+        LOGGER.debug("Query string: \n{}", query);
         List<Place> places = sparqlConnector.executeIndexQuery(query,
                                                                dataDef.getDataClassDef().getSparqlEndpoint(),
                                                                dataDef.getDataClassDef().getSelectPropertiesNames());
