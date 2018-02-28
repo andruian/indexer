@@ -1,7 +1,5 @@
 package cz.melkamar.andruian.indexer.endpoint;
 
-import cz.melkamar.andruian.indexer.Property;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
