@@ -13,8 +13,12 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class DataDefDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDefDAO.class);
+    private final RestTemplate restTemplate;
+
     @Autowired
-    private RestTemplate restTemplate;
+    public DataDefDAO(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public DataDef getDataDefFromUri(String uri) {
         LOGGER.info("Fetching DataDef from {}", uri);

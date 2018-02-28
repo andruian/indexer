@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/admin")
 public class AdminEndpoint {
+    private final DataDefDAO dataDefDAO;
+    private final IndexService indexService;
+
     @Autowired
-    DataDefDAO dataDefDAO;
-    @Autowired
-    private IndexService indexService;
+    public AdminEndpoint(DataDefDAO dataDefDAO, IndexService indexService) {
+        this.dataDefDAO = dataDefDAO;
+        this.indexService = indexService;
+    }
 
 
     @RequestMapping("reindex")

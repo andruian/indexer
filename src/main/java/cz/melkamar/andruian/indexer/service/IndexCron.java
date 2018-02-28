@@ -15,12 +15,18 @@ import javax.annotation.PostConstruct;
 //@ConditionalOnProperty(IndexerConfiguration.INDEX_CRON)
 public class IndexCron {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    private final IndexerConfiguration indexerConfiguration;
+    private final IndexService indexService;
+    private final DataDefDAO dataDefDAO;
+
     @Autowired
-    private IndexerConfiguration indexerConfiguration;
-    @Autowired
-    private IndexService indexService;
-    @Autowired
-    private DataDefDAO dataDefDAO;
+    public IndexCron(IndexerConfiguration indexerConfiguration,
+                     IndexService indexService,
+                     DataDefDAO dataDefDAO) {
+        this.indexerConfiguration = indexerConfiguration;
+        this.indexService = indexService;
+        this.dataDefDAO = dataDefDAO;
+    }
 
     @Scheduled(cron = "${" + IndexerConfiguration.INDEX_CRON + "}")
     public void triggerReindex() {
