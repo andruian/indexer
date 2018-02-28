@@ -60,7 +60,7 @@
                  sp:path1 ruian:adresniBod;
                  sp:path2 [
                      sp:path1 s:geo;
-                     sp:path2 s:longitude;
+                     sp:path2 s:latitude;
                  ]
                ];
     andr:long  [ # Do not fill in type - app should handle this case

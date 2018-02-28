@@ -157,8 +157,13 @@ public class DataDefParser {
             } else {
                 String part2type = getResourceType(part2);
                 if (part2type == null) {
-                    pathParts.add(part2.toString());
-                    break;
+                    // Check if part2 has path1 in its properties. If yes, assume it's a node with more path elements
+                    if (part2.getProperty(new PropertyImpl(URIs.SP.path1)) == null) {
+                        pathParts.add(part2.toString());
+                        break;
+                    } else {
+                        seqPath = part2;
+                    }
                 } else if (part2type.equals(URIs.SP.SeqPath)) {
                     seqPath = part2;
                 } else {

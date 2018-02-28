@@ -1,6 +1,7 @@
 package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.Util;
+import cz.melkamar.andruian.indexer.model.datadef.ClassToCoordPropPath;
 import cz.melkamar.andruian.indexer.model.datadef.DataClassDef;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
@@ -76,5 +77,23 @@ public class DataDefParserTest {
         assertEquals("http://ruian.linked.opendata.cz/sparql", dataDef.getLocationDef().getSparqlEndpoint());
         assertEquals(URIs.Prefix.ruian + "AdresniMisto", dataDef.getLocationDef().getClassUri());
         assertEquals(1, dataDef.getLocationDef().getPathsToGps().size());
+    }
+
+    /**
+     * Parse path from a Location Class to its GPS.
+     */
+    @Test
+    public void parsePropertyPathLocClass() {
+        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDef dataDef = dataDefParser.parse();
+
+        ClassToCoordPropPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
+        assertEquals(URIs.Prefix.s + "geo", paths.getLatCoord().getPathElements()[1]);
+        assertEquals(URIs.Prefix.s + "latitude", paths.getLatCoord().getPathElements()[2]);
+
+        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLongCoord().getPathElements()[0]);
+        assertEquals(URIs.Prefix.s + "geo", paths.getLongCoord().getPathElements()[1]);
+        assertEquals(URIs.Prefix.s + "longitude", paths.getLongCoord().getPathElements()[2]);
     }
 }
