@@ -3,7 +3,7 @@ package cz.melkamar.andruian.indexer.model.datadef;
 public class PropertyPath {
     private final String[] pathElements;
 
-    public PropertyPath(String[] pathElements) {
+    public PropertyPath(String... pathElements) {
         this.pathElements = pathElements;
     }
 
