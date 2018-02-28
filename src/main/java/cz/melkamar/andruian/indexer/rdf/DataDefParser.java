@@ -134,7 +134,15 @@ public class DataDefParser {
      */
     public PropertyPath parsePropertyPath(Resource seqPath) {
         String type = getResourceType(seqPath);
-        if (!type.equals(URIs.SP.SeqPath)) {
+        if (type == null) {
+            // No type specified for this node - check if there is a path1 and if so, just assume user forgot to fill
+            // in sp:SeqPath type.
+            if (seqPath.getProperty(new PropertyImpl(URIs.SP.path1)) == null) {
+                throw new NotImplementedException(
+                        "No type specified and path1 property not found for an object that should be a sp:SeqPath.");
+            }
+        } else if (!type.equals(URIs.SP.SeqPath)) {
+            // Do not force users to have seqpath type - check if maybe the 
             throw new NotImplementedException("PropertyPath type " + type + " not implemented yet.");
         }
 
