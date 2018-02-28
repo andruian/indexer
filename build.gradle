@@ -39,4 +39,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs
     compile group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.6.0'
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
 }

@@ -1,0 +1,51 @@
+package cz.melkamar.andruian.indexer.dao;
+
+import cz.melkamar.andruian.indexer.Util;
+import cz.melkamar.andruian.indexer.model.datadef.DataDef;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestTemplate;
+
+import static org.junit.Assert.assertEquals;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class DataDefDAOTest {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private DataDefDAO dataDefDAO;
+
+    MockRestServiceServer mockServer;
+
+    @Before
+    public void setUp() throws Exception {
+        mockServer = MockRestServiceServer.createServer(restTemplate);
+    }
+
+    /**
+     * Set up a mock server and respond with the contents of rdf/datadef.ttl test file.
+     */
+    @Test
+    public void getDataDef() throws Exception {
+        String testUri = "https://example.org/rdf";
+        String payload = Util.readStringFromResource("rdf/datadef.ttl", this.getClass());
+        mockServer
+                .expect(MockRestRequestMatchers.requestTo(testUri))
+                .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));
+
+        DataDef dataDef = dataDefDAO.getDataDef(testUri);
+        assertEquals("http://foo/dataDef", dataDef.getUri());
+    }
+
+}

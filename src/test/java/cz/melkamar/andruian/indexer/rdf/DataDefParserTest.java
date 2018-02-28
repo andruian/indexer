@@ -1,29 +1,25 @@
 package cz.melkamar.andruian.indexer.rdf;
 
+import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.model.datadef.DataClassDef;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.assertj.core.internal.Uris;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.util.List;
+import java.io.FileNotFoundException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DataDefParserTest {
     Model datadefModel;
 
     @Before
     public void initRdfModel() throws FileNotFoundException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("rdf/datadef.ttl").getFile());
-        datadefModel = ModelFactory.createDefaultModel();
-        datadefModel.read(new FileInputStream(file), null, "TURTLE");
+        datadefModel = Util.readModelFromResource("rdf/datadef.ttl", this.getClass());
     }
 
     @Test

@@ -1,45 +1,32 @@
 package cz.melkamar.andruian.indexer.dao;
 
-import cz.melkamar.andruian.indexer.exception.NotImplementedException;
-import cz.melkamar.andruian.indexer.model.datadef.DataClassDef;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
-import cz.melkamar.andruian.indexer.model.datadef.LocationDef;
-import cz.melkamar.andruian.indexer.model.datadef.PropertyPath;
 import cz.melkamar.andruian.indexer.rdf.DataDefParser;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.util.FileManager;
+import cz.melkamar.andruian.indexer.rdf.JenaUtil;
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 public class DataDefDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDefDAO.class);
-    static String andrPrefix = "";
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-        String inputFileName = "d:\\cvut-checkouted\\andruian\\examples\\datadef.ttl";
-
-        Model model = ModelFactory.createDefaultModel();
-        InputStream in = FileManager.get().open(inputFileName);
-        if (in == null) throw new IllegalArgumentException("File: " + inputFileName + " not found");
-        model.read(in, null, "TURTLE");
-        model.write(System.out, "TURTLE");
-
-        DataDefParser dataDefParser = new DataDefParser(model);
-        System.out.println(dataDefParser.parse());
-
-    }
+    @Autowired
+    private RestTemplate restTemplate;
 
     public DataDef getDataDef(String uri) {
-        throw new NotImplementedException();
+        LOGGER.info("Fetching DataDef from {}", uri);
+
+        String payload = restTemplate.getForObject(uri, String.class);
+        Model model = JenaUtil.modelFromString(payload);
+        if (model == null) { // TODO maybe use exceptions instead of this?
+            LOGGER.error("Model could not be parsed.");
+            return null;
+        }
+
+        DataDefParser parser = new DataDefParser(model);
+        return parser.parse();
     }
 }
