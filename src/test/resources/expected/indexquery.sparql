@@ -36,8 +36,8 @@ WHERE {
   #   ?dataObj ex:a/ex:b/ex:c ?selectPropA .
   #
   # There will be one line per each selectProp
-  ?dataObj <sA>/<x> selectA .
-?dataObj <sB>/<y> selectB .
+  ?dataObj <sA>/<x> ?selectA .
+?dataObj <sB>/<y> ?selectB .
 
 
   #
