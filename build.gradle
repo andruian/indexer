@@ -1,6 +1,7 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.10.RELEASE'
+//        springBootVersion = '1.5.10.RELEASE'
+        springBootVersion = '2.0.0.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -47,5 +48,5 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
-    compile group: 'org.apache.solr', name: 'solr-solrj', version: '7.2.0'
+    compile("org.springframework.boot:spring-boot-starter-data-solr")
 }
