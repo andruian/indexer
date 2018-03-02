@@ -9,6 +9,9 @@ public class IndexerConfiguration {
     public static final String INDEX_CRON = "indexing.cron";
     public static final String ONSTART_REINDEX = "onstart.reindex";
 
+    public static final String DB_SOLR_URL = "db.solr.url";
+    public static final String DB_SOLR_COLLECTION = "db.solr.collection";
+
     @Value("${" + DATADEFS + "}")
     private String[] dataDefs;
 
@@ -17,6 +20,11 @@ public class IndexerConfiguration {
 
     @Value("${" + ONSTART_REINDEX + ":#{false}}")
     private boolean onStartReindex;
+
+    @Value("${" + DB_SOLR_URL + "}")
+    private String dbSolrUri;
+    @Value("${" + DB_SOLR_COLLECTION + "}")
+    private String dbSolrCollection;
 
     public String[] getDataDefUris() {
         return dataDefs;
@@ -28,5 +36,13 @@ public class IndexerConfiguration {
 
     public boolean isOnStartReindex() {
         return onStartReindex;
+    }
+
+    public String getDbSolrUri() {
+        return dbSolrUri;
+    }
+
+    public String getDbSolrCollection() {
+        return dbSolrCollection;
     }
 }
