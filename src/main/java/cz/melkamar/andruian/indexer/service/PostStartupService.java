@@ -1,7 +1,10 @@
 package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
+import cz.melkamar.andruian.indexer.dao.MongoPlaceRepository;
 import cz.melkamar.andruian.indexer.dao.SolrPlaceRepository;
+import cz.melkamar.andruian.indexer.model.place.Place;
+import cz.melkamar.andruian.indexer.model.place.Property;
 import cz.melkamar.andruian.indexer.model.place.SolrPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostStartupService {
@@ -19,14 +23,17 @@ public class PostStartupService {
     private final IndexService indexService;
     private final IndexerConfiguration indexerConfiguration;
     private final SolrPlaceRepository solrRepository;
+    private final MongoPlaceRepository mongoRepository;
 
     @Autowired
     public PostStartupService(IndexService indexService,
                               IndexerConfiguration indexerConfiguration,
-                              SolrPlaceRepository solrRepository) {
+                              SolrPlaceRepository solrRepository,
+                              MongoPlaceRepository mongoRepository) {
         this.indexService = indexService;
         this.indexerConfiguration = indexerConfiguration;
         this.solrRepository = solrRepository;
+        this.mongoRepository = mongoRepository;
     }
 
 
@@ -35,11 +42,29 @@ public class PostStartupService {
             LOGGER.info("Triggering on-startup reindexing");
             indexService.reindexAll();
         }
-        
-        listStuff();
+
+//        listStuff();
+        saveToMongo();
+        readFromMongo();
     }
 
-    public void listStuff(){
+    public void saveToMongo() {
+        Place place = new Place(
+                50, 14, System.currentTimeMillis() + "", "clsUri",
+                "locObjUri", new Property[]{
+            new Property("foo", 42),
+            new Property("xxx", "bar"),
+        });
+        mongoRepository.save(place);
+        System.out.println("Saved something to mongo");
+    }
+    
+    public void readFromMongo(){
+        Optional<Place> a = mongoRepository.findByUri("1520007854325a");
+        System.out.println(a.map(Place::toString).orElse("nothing"));
+    }
+
+    public void listStuff() {
         List<SolrPlace> places = solrRepository.findByTypeAndLocationWithin(
                 "mytype",
                 new Point(50.052828, 14.439898),

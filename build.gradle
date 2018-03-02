@@ -50,4 +50,5 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile("org.springframework.boot:spring-boot-starter-data-solr:2.0.0.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb:2.0.0.RELEASE")
 }

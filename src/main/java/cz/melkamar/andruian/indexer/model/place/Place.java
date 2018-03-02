@@ -1,10 +1,13 @@
 package cz.melkamar.andruian.indexer.model.place;
 
+import org.apache.solr.client.solrj.beans.Field;
+
 import java.util.Arrays;
 
 public class Place {
     private final double latPos;
     private final double longPos;
+    @Field
     private final String uri;
     private final String classUri;
     private final String locationObjectUri;
@@ -32,7 +35,7 @@ public class Place {
     public double getLongPos() {
         return longPos;
     }
-
+    
     public String getUri() {
         return uri;
     }

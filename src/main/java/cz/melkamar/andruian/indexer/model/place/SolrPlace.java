@@ -11,7 +11,8 @@ import org.springframework.data.solr.core.mapping.SolrDocument;
  * We will only be storing the URI, type (class) and location of places. This is minimal data necessary for
  * indexing. Additional data will be stored elsewhere.
  */
-@SolrDocument(solrCoreName = "${db.solr.collection}")
+//@SolrDocument(solrCoreName = "${db.solr.collection}")
+@SolrDocument(solrCoreName = "andruian") // TODO why is the property reference not resolving?
 public class SolrPlace {
     @Id
     @Field
