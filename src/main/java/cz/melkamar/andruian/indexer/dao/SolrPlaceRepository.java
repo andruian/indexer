@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PlaceSolrRepository extends SolrCrudRepository<SolrPlace, String> {
+public interface SolrPlaceRepository extends SolrCrudRepository<SolrPlace, String> {
     List<SolrPlace> findByTypeAndLocationWithin(String type, Point location, Distance distance);
+    List<SolrPlace> findByType(String type);
 }

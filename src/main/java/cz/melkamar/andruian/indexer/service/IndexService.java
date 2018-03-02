@@ -2,8 +2,7 @@ package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.DataDefDAO;
-import cz.melkamar.andruian.indexer.dao.store.SolrDAO;
-import cz.melkamar.andruian.indexer.exception.DAOException;
+import cz.melkamar.andruian.indexer.dao.SolrPlaceRepository;
 import cz.melkamar.andruian.indexer.model.SolrPlace;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
@@ -27,17 +26,17 @@ public class IndexService {
     private final IndexerConfiguration indexerConfiguration;
     private final DataDefDAO dataDefDAO;
     private final SparqlConnector sparqlConnector;
-    private final SolrDAO solrDAO;
+    private final SolrPlaceRepository solrPlaceRepository;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
                         DataDefDAO dataDefDAO,
                         SparqlConnector sparqlConnector,
-                        SolrDAO solrDAO) {
+                        SolrPlaceRepository solrPlaceRepository) {
         this.indexerConfiguration = indexerConfiguration;
         this.dataDefDAO = dataDefDAO;
         this.sparqlConnector = sparqlConnector;
-        this.solrDAO = solrDAO;
+        this.solrPlaceRepository = solrPlaceRepository;
     }
 
     @Async
@@ -58,9 +57,10 @@ public class IndexService {
         }
 
         // TODO allow forcing full reindex
-        for (SolrPlace solrPlace : solrDAO.getSolrPlacesOfClass(dataDef.getDataClassDef().getClassUri())) {
+        for (SolrPlace solrPlace : solrPlaceRepository.findByType(dataDef.getDataClassDef().getClassUri())) {
             queryBuilder.excludeUri(solrPlace.getUri());
         }
+
 
         String query = queryBuilder.build();
         LOGGER.debug("Query string: \n{}", query);
@@ -73,21 +73,7 @@ public class IndexService {
             LOGGER.debug(place.toString());
         }
 
-        try {
-            solrDAO.saveSolrPlaces(
-                    places.stream().map(SolrPlace::new).collect(Collectors.toList())
-            );
-        } catch (DAOException e) {
-            e.printStackTrace();
-            // TODO handle error
-        }
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        solrPlaceRepository.saveAll(places.stream().map(SolrPlace::new).collect(Collectors.toList()));
 
         LOGGER.info("Finished indexing {}", dataDef.getUri());
         return CompletableFuture.completedFuture(null);
