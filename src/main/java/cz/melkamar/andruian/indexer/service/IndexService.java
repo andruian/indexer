@@ -3,6 +3,7 @@ package cz.melkamar.andruian.indexer.service;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.DataDefDAO;
 import cz.melkamar.andruian.indexer.dao.store.SolrDAO;
+import cz.melkamar.andruian.indexer.exception.DAOException;
 import cz.melkamar.andruian.indexer.model.SolrPlace;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class IndexService {
@@ -54,7 +56,7 @@ public class IndexService {
         for (SelectProperty selectProperty : dataDef.getDataClassDef().getSelectProperties()) {
             queryBuilder.addSelectProperty(selectProperty);
         }
-        
+
         // TODO allow forcing full reindex
         for (SolrPlace solrPlace : solrDAO.getSolrPlacesOfClass(dataDef.getDataClassDef().getClassUri())) {
             queryBuilder.excludeUri(solrPlace.getUri());
@@ -71,7 +73,14 @@ public class IndexService {
             LOGGER.debug(place.toString());
         }
 
-        // TODO index here
+        try {
+            solrDAO.saveSolrPlaces(
+                    places.stream().map(SolrPlace::new).collect(Collectors.toList())
+            );
+        } catch (DAOException e) {
+            e.printStackTrace();
+            // TODO handle error
+        }
 
         try {
             Thread.sleep(5000);

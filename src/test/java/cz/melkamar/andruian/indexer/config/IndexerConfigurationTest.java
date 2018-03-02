@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(locations = "classpath:properties/indexer-configuration-test.properties")
 public class IndexerConfigurationTest {
 
 
