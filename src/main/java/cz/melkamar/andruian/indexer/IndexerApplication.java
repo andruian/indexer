@@ -25,5 +25,6 @@ public class IndexerApplication {
         LOGGER.error("error");
 
         context.getBean(PostStartupService.class).postStartup();
+        System.exit(0);
     }
 }
