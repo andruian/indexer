@@ -2,6 +2,7 @@ package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.DataDefDAO;
+import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.dao.SolrPlaceRepository;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 public class IndexService {
@@ -27,16 +27,18 @@ public class IndexService {
     private final DataDefDAO dataDefDAO;
     private final SparqlConnector sparqlConnector;
     private final SolrPlaceRepository solrPlaceRepository;
+    private final PlaceDAO placeDAO;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
                         DataDefDAO dataDefDAO,
                         SparqlConnector sparqlConnector,
-                        SolrPlaceRepository solrPlaceRepository) {
+                        SolrPlaceRepository solrPlaceRepository, PlaceDAO placeDAO) {
         this.indexerConfiguration = indexerConfiguration;
         this.dataDefDAO = dataDefDAO;
         this.sparqlConnector = sparqlConnector;
         this.solrPlaceRepository = solrPlaceRepository;
+        this.placeDAO = placeDAO;
     }
 
     @Async
@@ -73,7 +75,7 @@ public class IndexService {
             LOGGER.debug(place.toString());
         }
 
-        solrPlaceRepository.saveAll(places.stream().map(SolrPlace::new).collect(Collectors.toList()));
+        placeDAO.savePlaces(places);
 
         LOGGER.info("Finished indexing {}", dataDef.getUri());
         return CompletableFuture.completedFuture(null);
