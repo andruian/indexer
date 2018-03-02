@@ -2,12 +2,11 @@ package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.SolrPlaceRepository;
-import cz.melkamar.andruian.indexer.model.SolrPlace;
+import cz.melkamar.andruian.indexer.model.place.SolrPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
-
 import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 

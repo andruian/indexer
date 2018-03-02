@@ -1,6 +1,5 @@
-package cz.melkamar.andruian.indexer.model;
+package cz.melkamar.andruian.indexer.model.place;
 
-import cz.melkamar.andruian.indexer.model.place.Place;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;

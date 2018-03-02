@@ -1,6 +1,6 @@
 package cz.melkamar.andruian.indexer.dao;
 
-import cz.melkamar.andruian.indexer.model.SolrPlace;
+import cz.melkamar.andruian.indexer.model.place.SolrPlace;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
 import org.springframework.data.solr.repository.SolrCrudRepository;
