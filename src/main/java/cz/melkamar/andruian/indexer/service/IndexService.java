@@ -2,6 +2,8 @@ package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.DataDefDAO;
+import cz.melkamar.andruian.indexer.dao.store.SolrDAO;
+import cz.melkamar.andruian.indexer.model.SolrPlace;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -23,13 +25,17 @@ public class IndexService {
     private final IndexerConfiguration indexerConfiguration;
     private final DataDefDAO dataDefDAO;
     private final SparqlConnector sparqlConnector;
+    private final SolrDAO solrDAO;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
-                        DataDefDAO dataDefDAO, SparqlConnector sparqlConnector) {
+                        DataDefDAO dataDefDAO,
+                        SparqlConnector sparqlConnector,
+                        SolrDAO solrDAO) {
         this.indexerConfiguration = indexerConfiguration;
         this.dataDefDAO = dataDefDAO;
         this.sparqlConnector = sparqlConnector;
+        this.solrDAO = solrDAO;
     }
 
     @Async
@@ -48,20 +54,24 @@ public class IndexService {
         for (SelectProperty selectProperty : dataDef.getDataClassDef().getSelectProperties()) {
             queryBuilder.addSelectProperty(selectProperty);
         }
-
-        // TODO filter out what we already have
+        
+        // TODO allow forcing full reindex
+        for (SolrPlace solrPlace : solrDAO.getSolrPlacesOfClass(dataDef.getDataClassDef().getClassUri())) {
+            queryBuilder.excludeUri(solrPlace.getUri());
+        }
 
         String query = queryBuilder.build();
         LOGGER.debug("Query string: \n{}", query);
         List<Place> places = sparqlConnector.executeIndexQuery(query,
                                                                dataDef.getDataClassDef().getSparqlEndpoint(),
                                                                dataDef.getDataClassDef().getSelectPropertiesNames());
-        
+
         LOGGER.info("Indexed {} places from DataDef at {}:", places.size(), dataDef.getUri());
-        for (Place place: places){
+        for (Place place : places) {
             LOGGER.debug(place.toString());
         }
-        // TODO index in SOLR
+
+        // TODO index here
 
         try {
             Thread.sleep(5000);
