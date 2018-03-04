@@ -3,6 +3,8 @@ package cz.melkamar.andruian.indexer.dao;
 import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.SolrPlace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class PlaceDAO {
+    private final static Logger LOGGER = LoggerFactory.getLogger(PlaceDAO.class);
+    
     private final MongoPlaceRepository mongoPlaceRepository;
     private final SolrPlaceRepository solrPlaceRepository;
 
@@ -35,11 +39,16 @@ public class PlaceDAO {
     }
 
     public void savePlace(Place place) {
+        LOGGER.debug("Indexing a place: "+place);
+        
         solrPlaceRepository.save(new SolrPlace(place));
         mongoPlaceRepository.save(place);
     }
 
     public void savePlaces(List<Place> places) {
+        LOGGER.debug("Indexing "+places.size()+" places");
+        if (places.isEmpty()) return;
+        
         solrPlaceRepository.saveAll(places.stream().map(SolrPlace::new).collect(Collectors.toList()));
         mongoPlaceRepository.saveAll(places);
     }
@@ -49,7 +58,8 @@ public class PlaceDAO {
     }
 
     public List<Place> getAllPlaces() {
-        throw new NotImplementedException();
+        LOGGER.debug("Fetching all places");
+        return mongoPlaceRepository.findAll();
     }
 
     public List<Place> getPlacesOfClass(String classUri) {

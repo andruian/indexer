@@ -41,9 +41,27 @@ public class IndexService {
         this.placeDAO = placeDAO;
     }
 
+    /**
+     * Index data defined by the given DataDef object.
+     * <p>
+     * Build a SPARQL query based on the {@link DataDef} and run this query on a data SPARQL endpoint.
+     * The query will select all objects of a type defined in the {@link DataDef} and find their linked
+     * location objects and position coordinates (via a federated query, those objects may be accessible through a
+     * different endpoint - in the prototype version this will be the RÚIAN SPARQL endpoint).
+     * <p>
+     * Objects obtained by the query will be stored in Solr and MongoDB. Solr will only contain a stub of the
+     * full representation - {@link SolrPlace}). This stub will contain location coordinates and a URI of the
+     * resource. The whole representation - {@link Place} will be stored in MongoDB with the resource URI as the key.
+     * 
+     * @param dataDef     A definition of the data.
+     * @param fullReindex If true, reindex everything. If false, skip querying of objects already indexed (incremental
+     *                    reindex).
+     * @return TODO: maybe no return value is even necessary?
+     */
     @Async
-    public CompletableFuture indexDataDef(DataDef dataDef) {
-        LOGGER.info("Indexing data from DataDef {}", dataDef.getUri());
+    public CompletableFuture indexDataDef(DataDef dataDef, boolean fullReindex) {
+        // TODO during fullReindex delete objects that no longer exist from Mongo+Solr
+        LOGGER.info("Indexing data from DataDef {}. Full reindex: {}", dataDef.getUri(), fullReindex);
 
         // Indexing stuff here
         IndexQueryBuilder queryBuilder = new IndexQueryBuilder(
@@ -58,9 +76,10 @@ public class IndexService {
             queryBuilder.addSelectProperty(selectProperty);
         }
 
-        // TODO allow forcing full reindex
-        for (SolrPlace solrPlace : solrPlaceRepository.findByType(dataDef.getDataClassDef().getClassUri())) {
-            queryBuilder.excludeUri(solrPlace.getUri());
+        if (!fullReindex) {
+            for (SolrPlace solrPlace : solrPlaceRepository.findByType(dataDef.getDataClassDef().getClassUri())) {
+                queryBuilder.excludeUri(solrPlace.getUri());
+            }
         }
 
 
@@ -81,7 +100,7 @@ public class IndexService {
         return CompletableFuture.completedFuture(null);
     }
 
-    public void reindexAll() {
+    public void reindexAll(boolean fullReindex) {
         LOGGER.warn("Reindexing...");
 
         String[] dataDefUris = indexerConfiguration.getDataDefUris();
@@ -91,7 +110,7 @@ public class IndexService {
                 LOGGER.error("Could not get or parse DataDef from URL: {}", dataDefUri);
                 continue;
             }
-            indexDataDef(dataDef);
+            indexDataDef(dataDef, fullReindex);
         }
     }
 }

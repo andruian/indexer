@@ -1,8 +1,6 @@
 package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
-import cz.melkamar.andruian.indexer.dao.DataDefDAO;
-import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,7 @@ public class IndexCron {
     @Scheduled(cron = "${" + IndexerConfiguration.INDEX_CRON + "}")
     public void triggerReindex() {
         LOGGER.warn("Triggering cron reindex");
-        indexService.reindexAll();
+        indexService.reindexAll(false);
     }
 
     @PostConstruct

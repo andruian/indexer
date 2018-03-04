@@ -1,13 +1,13 @@
 package cz.melkamar.andruian.indexer.model.place;
 
-import org.apache.solr.client.solrj.beans.Field;
+import org.springframework.data.annotation.Id;
 
 import java.util.Arrays;
 
 public class Place {
     private final double latPos;
     private final double longPos;
-    @Field
+    @Id
     private final String uri;
     private final String classUri;
     private final String locationObjectUri;

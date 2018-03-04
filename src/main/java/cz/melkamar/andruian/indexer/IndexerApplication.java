@@ -24,7 +24,11 @@ public class IndexerApplication {
         LOGGER.warn("warn");
         LOGGER.error("error");
 
-        context.getBean(PostStartupService.class).postStartup();
-        System.exit(0);
+        try {
+            context.getBean(PostStartupService.class).postStartup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        System.exit(0);
     }
 }

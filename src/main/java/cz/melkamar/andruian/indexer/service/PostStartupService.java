@@ -40,7 +40,7 @@ public class PostStartupService {
     public void postStartup() {
         if (indexerConfiguration.isOnStartReindex()) {
             LOGGER.info("Triggering on-startup reindexing");
-            indexService.reindexAll();
+            indexService.reindexAll(false);
         }
 
 //        listStuff();

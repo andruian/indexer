@@ -74,9 +74,11 @@ public class SparqlConnector {
                 "  }\n" +
                 "}";
 
-        List<Place> places = new SparqlConnector().executeIndexQuery(query, "http://localhost:3030/test/query", new String[]{"id"});
-        for (Place place: places){
-            System.out.println(place);    
+        List<Place> places = new SparqlConnector().executeIndexQuery(query,
+                                                                     "http://localhost:3030/test/query",
+                                                                     new String[]{"id"});
+        for (Place place : places) {
+            System.out.println(place);
         }
     }
 
@@ -105,6 +107,7 @@ public class SparqlConnector {
         String locationObjUri = querySolution.getResource("locationObj").toString();
         double latitude = querySolution.getLiteral("lat").getDouble();
         double longitude = querySolution.getLiteral("long").getDouble();
+        String dataClassType = querySolution.getResource("dataClassType").toString();
 
         Property[] properties = new Property[selectProperties.length];
         for (int i = 0; i < selectProperties.length; i++) {
@@ -118,7 +121,7 @@ public class SparqlConnector {
             }
         }
 
-        return new Place(latitude, longitude, dataObjUri, "", locationObjUri, properties);
+        return new Place(latitude, longitude, dataObjUri, dataClassType, locationObjUri, properties);
     }
 
 }
