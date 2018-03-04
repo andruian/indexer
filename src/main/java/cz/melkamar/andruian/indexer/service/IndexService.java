@@ -3,7 +3,6 @@ package cz.melkamar.andruian.indexer.service;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.DataDefDAO;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
-import cz.melkamar.andruian.indexer.dao.SolrPlaceRepository;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -26,18 +25,16 @@ public class IndexService {
     private final IndexerConfiguration indexerConfiguration;
     private final DataDefDAO dataDefDAO;
     private final SparqlConnector sparqlConnector;
-    private final SolrPlaceRepository solrPlaceRepository;
     private final PlaceDAO placeDAO;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
                         DataDefDAO dataDefDAO,
                         SparqlConnector sparqlConnector,
-                        SolrPlaceRepository solrPlaceRepository, PlaceDAO placeDAO) {
+                        PlaceDAO placeDAO) {
         this.indexerConfiguration = indexerConfiguration;
         this.dataDefDAO = dataDefDAO;
         this.sparqlConnector = sparqlConnector;
-        this.solrPlaceRepository = solrPlaceRepository;
         this.placeDAO = placeDAO;
     }
 
@@ -76,9 +73,9 @@ public class IndexService {
             queryBuilder.addSelectProperty(selectProperty);
         }
 
-        if (!fullReindex) {
-            for (SolrPlace solrPlace : solrPlaceRepository.findByType(dataDef.getDataClassDef().getClassUri())) {
-                queryBuilder.excludeUri(solrPlace.getUri());
+        if (!fullReindex) {  
+            for (Place place: placeDAO.getPlacesOfClass(dataDef.getDataClassDef().getClassUri())) {
+                queryBuilder.excludeUri(place.getUri());
             }
         }
 
