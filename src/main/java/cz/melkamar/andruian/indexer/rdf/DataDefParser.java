@@ -109,6 +109,7 @@ public class DataDefParser {
 
         Map<String, ClassToCoordPropPath> locPathsMap = new HashMap<>();
         StmtIterator pathDefs = locationDef.listProperties(new PropertyImpl(URIs.ANDR.classToLocPath));
+        // TODO schema format changed! there is not LocationClassPathsSource class inbetween LocationDef and ClassToLocPath
         while (pathDefs.hasNext()) {
             Resource pathDef = pathDefs.nextStatement().getResource();
             String pdClass = pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._class)).toString();
