@@ -35,12 +35,12 @@ public class DataDefFetcherTest {
     }
 
     /**
-     * Set up a mock server and respond with the contents of rdf/datadef.ttl test file.
+     * Set up a mock server and respond with the contents of rdf/test-parse-datadef.ttl test file.
      */
     @Test
     public void getDataDef() throws Exception {
         String testUri = "https://example.org/rdf";
-        String payload = Util.readStringFromResource("rdf/datadef.ttl", this.getClass());
+        String payload = Util.readStringFromResource("rdf/test-parse-datadef.ttl", this.getClass());
         mockServer
                 .expect(MockRestRequestMatchers.requestTo(testUri))
                 .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));

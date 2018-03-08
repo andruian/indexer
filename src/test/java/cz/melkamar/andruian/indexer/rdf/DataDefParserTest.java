@@ -20,7 +20,7 @@ public class DataDefParserTest {
 
     @Before
     public void initRdfModel() throws FileNotFoundException {
-        datadefModel = Util.readModelFromResource("rdf/datadef.ttl", this.getClass());
+        datadefModel = Util.readModelFromResource("rdf/test-parse-datadef.ttl", this.getClass());
     }
 
     @Test
