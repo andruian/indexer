@@ -1,5 +1,7 @@
 package cz.melkamar.andruian.indexer.net;
 
+import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
+import cz.melkamar.andruian.indexer.exception.RdfFormatException;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.rdf.DataDefParser;
 import cz.melkamar.andruian.indexer.rdf.JenaUtil;
@@ -20,16 +22,17 @@ public class DataDefFetcher {
         this.restTemplate = restTemplate;
     }
 
-    public DataDef getDataDefFromUri(String uri) {
+    public DataDef getDataDefFromUri(String uri) throws RdfFormatException, DataDefFormatException {
         LOGGER.info("Fetching DataDef from {}", uri);
 
         String payload = restTemplate.getForObject(uri, String.class);
+        LOGGER.trace("Downloaded payload");
         Model model = JenaUtil.modelFromString(payload);
         if (model == null) { // TODO maybe use exceptions instead of this?
-            LOGGER.error("Model could not be parsed.");
-            return null;
+            LOGGER.error("Model could not be parsed from url: {}", uri);
+            throw new RdfFormatException("Model could not be parsed.");
         }
-
+        
         DataDefParser parser = new DataDefParser(model);
         return parser.parse();
     }

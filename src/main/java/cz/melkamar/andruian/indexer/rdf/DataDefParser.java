@@ -1,5 +1,6 @@
 package cz.melkamar.andruian.indexer.rdf;
 
+import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
 import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.model.datadef.*;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
@@ -23,7 +24,7 @@ public class DataDefParser {
         this.model = model;
     }
 
-    public DataDef parse() {
+    public DataDef parse() throws DataDefFormatException {
         String dataDefClassURI = URIs.ANDR.DataDef;
 
         ResIterator iter = model.listSubjectsWithProperty(new PropertyImpl(URIs.RDF.type),
@@ -41,7 +42,8 @@ public class DataDefParser {
             LOGGER.debug("Parsed dataDef: {}", dataDef);
             return dataDef; // todo this should be better
         }
-        return null;
+
+        throw new DataDefFormatException("No property of type " + dataDefClassURI + " found in RDF");
     }
 
     /**

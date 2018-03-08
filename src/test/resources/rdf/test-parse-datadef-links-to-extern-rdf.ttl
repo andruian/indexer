@@ -1,4 +1,4 @@
-@prefix andr: <purl.org/net/andruian/datadef#> .
+@prefix andr: <http://purl.org/net/andruian/datadef#> .
 @prefix ruian: <http://ruian.linked.opendata.cz/ontology/> .
 @prefix sp: <http://spinrdf.org/sp#> .
 @prefix s: <http://schema.org/> .

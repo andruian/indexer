@@ -2,7 +2,7 @@ package cz.melkamar.andruian.indexer.rdf;
 
 public class URIs {
     public static class Prefix {
-        public final static String andr = "http://purl.org/net/andruian/datadef";
+        public final static String andr = "http://purl.org/net/andruian/datadef#";
         public final static String rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
         public final static String ruian = "http://ruian.linked.opendata.cz/ontology/";
         public final static String sp = "http://spinrdf.org/sp#";

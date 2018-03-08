@@ -1,6 +1,8 @@
 package cz.melkamar.andruian.indexer.endpoint;
 
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
+import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
+import cz.melkamar.andruian.indexer.exception.RdfFormatException;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.Property;
@@ -41,9 +43,15 @@ public class AdminEndpoint {
         LOGGER.info("Reindex uri: '{}'. Full reindex: {}", dataDefUri, fullReindex);
 
         if (dataDefUri != null && dataDefUri.length() > 0) {
-            DataDef dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
-            indexService.indexDataDef(dataDef, fullReindex);
-            return "Refreshing " + dataDefUri;
+            
+            try {
+                DataDef dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
+                indexService.indexDataDef(dataDef, fullReindex);
+                return "Refreshing " + dataDefUri;
+            } catch (RdfFormatException | DataDefFormatException e) {
+                e.printStackTrace();
+                return e.toString();
+            }
         } else {
             // TODO Display GUI?
             // TODO at least list available URIs

@@ -2,6 +2,8 @@ package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
+import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
+import cz.melkamar.andruian.indexer.exception.RdfFormatException;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -49,7 +51,7 @@ public class IndexService {
      * Objects obtained by the query will be stored in Solr and MongoDB. Solr will only contain a stub of the
      * full representation - {@link SolrPlace}). This stub will contain location coordinates and a URI of the
      * resource. The whole representation - {@link Place} will be stored in MongoDB with the resource URI as the key.
-     * 
+     *
      * @param dataDef     A definition of the data.
      * @param fullReindex If true, reindex everything. If false, skip querying of objects already indexed (incremental
      *                    reindex).
@@ -73,8 +75,8 @@ public class IndexService {
             queryBuilder.addSelectProperty(selectProperty);
         }
 
-        if (!fullReindex) {  
-            for (Place place: placeDAO.getPlacesOfClass(dataDef.getSourceClassDef().getClassUri())) {
+        if (!fullReindex) {
+            for (Place place : placeDAO.getPlacesOfClass(dataDef.getSourceClassDef().getClassUri())) {
                 queryBuilder.excludeUri(place.getUri());
             }
         }
@@ -102,11 +104,15 @@ public class IndexService {
 
         String[] dataDefUris = indexerConfiguration.getDataDefUris();
         for (String dataDefUri : dataDefUris) {
-            DataDef dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
-            if (dataDef == null) {
+            DataDef dataDef = null;
+            try {
+                dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
+            } catch (RdfFormatException | DataDefFormatException e) {
                 LOGGER.error("Could not get or parse DataDef from URL: {}", dataDefUri);
+                e.printStackTrace();
                 continue;
             }
+
             indexDataDef(dataDef, fullReindex);
         }
     }

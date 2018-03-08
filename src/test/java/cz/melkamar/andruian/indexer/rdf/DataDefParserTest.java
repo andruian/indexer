@@ -1,6 +1,7 @@
 package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.Util;
+import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
 import cz.melkamar.andruian.indexer.model.datadef.ClassToCoordPropPath;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
@@ -24,13 +25,13 @@ public class DataDefParserTest {
     }
 
     @Test
-    public void parseDoesNotThrowException() {
+    public void parseDoesNotThrowException() throws DataDefFormatException {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
         dataDefParser.parse();
     }
 
     @Test
-    public void parseDataDefUri() {
+    public void parseDataDefUri() throws DataDefFormatException {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
@@ -70,7 +71,7 @@ public class DataDefParserTest {
     }
 
     @Test
-    public void parseLocationDef() {
+    public void parseLocationDef() throws DataDefFormatException {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
@@ -83,7 +84,7 @@ public class DataDefParserTest {
      * Parse path from a Location Class to its GPS.
      */
     @Test
-    public void parsePropertyPathLocClass() {
+    public void parsePropertyPathLocClass() throws DataDefFormatException {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
