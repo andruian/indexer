@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 
 public class DataDefParserTest {
     Model datadefModel;
-    
+
     @Before
     public void initRdfModel() throws FileNotFoundException {
         datadefModel = Util.readModelFromResource("rdf/test-parse-datadef.ttl", this.getClass());
@@ -102,13 +102,37 @@ public class DataDefParserTest {
      */
     @Test
     public void parseLocationClassPathsSource() throws DataDefFormatException, FileNotFoundException {
-        Model datadefModel = Util.readModelFromResource("rdf/test-parse-datadef-locationClassPathsSource.ttl", this.getClass());
+        Model datadefModel = Util.readModelFromResource("rdf/test-parse-datadef-locationClassPathsSource.ttl",
+                                                        this.getClass());
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
         ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
         assertNotNull(paths);
-        
+
+        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
+        assertEquals(URIs.Prefix.s + "geo", paths.getLatCoord().getPathElements()[1]);
+        assertEquals(URIs.Prefix.s + "latitude", paths.getLatCoord().getPathElements()[2]);
+
+        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLongCoord().getPathElements()[0]);
+        assertEquals(URIs.Prefix.s + "geo", paths.getLongCoord().getPathElements()[1]);
+        assertEquals(URIs.Prefix.s + "longitude", paths.getLongCoord().getPathElements()[2]);
+    }
+
+    /**
+     * Parse a DataDef that has an external locationClassPathsSource containing ClassToLocPath.
+     * Test that an external RDF linked via andr:includeRdf is included properly
+     */
+    @Test
+    public void parseExternalLocationClassPathsSource() throws DataDefFormatException, FileNotFoundException {
+        Model datadefModel = Util.readModelFromResource("rdf/test-parse-datadef-links-to-extern-rdf.ttl",
+                                                        this.getClass());
+        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDef dataDef = dataDefParser.parse();
+
+        ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        assertNotNull(paths);
+
         assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
         assertEquals(URIs.Prefix.s + "geo", paths.getLatCoord().getPathElements()[1]);
         assertEquals(URIs.Prefix.s + "latitude", paths.getLatCoord().getPathElements()[2]);

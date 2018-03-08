@@ -114,7 +114,7 @@ public class DataDefParser {
         // Parse direct links of andr:classToLocPath
         locPathsMap.putAll(collectClassToLocPathsFromObject(locationDef));
 
-
+        // TODO how does this not crash?!
         // Parse indirect links of andr:locationClassPathsSource
         StmtIterator locationClassPathsSourcesIter = locationDef.listProperties(
                 new PropertyImpl(URIs.ANDR.locationClassPathsSource));
