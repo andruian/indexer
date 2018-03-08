@@ -40,8 +40,8 @@ public class DataDefParserTest {
     @Test
     public void parsePathToLocationClass() {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
-        Resource dataClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
-        SourceClassDef sourceClassDef = dataDefParser.parseDataClassDef(dataClassDefResource);
+        Resource sourceClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
+        SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(sourceClassDefResource);
 
         assertEquals("<http://example.org/linksTo>/<http://example.org/linksTo2>/<http://example.org/linksTo3>",
                      sourceClassDef.getPathToLocationClass().toString());
@@ -50,8 +50,8 @@ public class DataDefParserTest {
     @Test
     public void parseSelectProperties() {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
-        Resource dataClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
-        SourceClassDef sourceClassDef = dataDefParser.parseDataClassDef(dataClassDefResource);
+        Resource sourceClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
+        SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(sourceClassDefResource);
 
         SelectProperty[] selectProperties = sourceClassDef.getSelectProperties();
         assertEquals(2, selectProperties.length);

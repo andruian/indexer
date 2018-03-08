@@ -34,8 +34,8 @@ public class DataDefParser {
             Resource locationClassDefResource = dataDefResource.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.locationDef));
             LocationDef locationDef = parseLocationDef(locationClassDefResource);
 
-            Resource dataClassDefResource = dataDefResource.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.dataClassDef));
-            SourceClassDef sourceClassDef = parseDataClassDef(dataClassDefResource);
+            Resource sourceClassDefResource = dataDefResource.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.sourceClassDef));
+            SourceClassDef sourceClassDef = parseSourceClassDef(sourceClassDefResource);
 
             DataDef dataDef = new DataDef(dataDefResource.getURI(), locationDef, sourceClassDef);
             LOGGER.debug("Parsed dataDef: {}", dataDef);
@@ -47,21 +47,21 @@ public class DataDefParser {
     /**
      * Create a POJO from JENA RDF Resource.
      *
-     * @param dataClassDefResource
+     * @param sourceClassDefResource
      * @return
      */
-    public SourceClassDef parseDataClassDef(Resource dataClassDefResource) {
-        String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
+    public SourceClassDef parseSourceClassDef(Resource sourceClassDefResource) {
+        String sparqlEndpointURI = sourceClassDefResource.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
                 .getResource()
                 .toString();
 
-        String classURI = dataClassDefResource.getProperty(new PropertyImpl(URIs.ANDR._class))
+        String classURI = sourceClassDefResource.getProperty(new PropertyImpl(URIs.ANDR._class))
                 .getResource()
                 .toString();
 
-        SelectProperty[] selectProperties = parseSelectProperties(dataClassDefResource);
+        SelectProperty[] selectProperties = parseSelectProperties(sourceClassDefResource);
 
-        PropertyPath propertyPath = parsePropertyPath(dataClassDefResource.getPropertyResourceValue(new PropertyImpl(
+        PropertyPath propertyPath = parsePropertyPath(sourceClassDefResource.getPropertyResourceValue(new PropertyImpl(
                 URIs.ANDR.pathToLocationClass)));
 
 
@@ -70,13 +70,13 @@ public class DataDefParser {
     }
 
     /**
-     * Parse all andr:selectProperty of a given dataClassDef JENA resource.
+     * Parse all andr:selectProperty of a given sourceClassDef JENA resource.
      *
-     * @param dataClassDef
+     * @param sourceClassDef
      * @return
      */
-    public SelectProperty[] parseSelectProperties(Resource dataClassDef) {
-        StmtIterator iterator = dataClassDef.listProperties(new PropertyImpl(URIs.ANDR.selectProperty));
+    public SelectProperty[] parseSelectProperties(Resource sourceClassDef) {
+        StmtIterator iterator = sourceClassDef.listProperties(new PropertyImpl(URIs.ANDR.selectProperty));
         List<SelectProperty> properties = new ArrayList<>();
         while (iterator.hasNext()) {
             Resource selectPropertyResource = iterator.nextStatement().getResource();

@@ -12,12 +12,12 @@ public class URIs {
     }
 
     public static class ANDR {
-        public final static String dataClassDef = Prefix.andr + "dataClassDef";
+        public final static String sourceClassDef = Prefix.andr + "sourceClassDef";
         public final static String sparqlEndpoint = Prefix.andr + "sparqlEndpoint";
         public final static String _class = Prefix.andr + "class";
         public final static String pathToLocationClass = Prefix.andr + "pathToLocationClass";
         public final static String selectProperty = Prefix.andr + "selectProperty";
-        public final static String DataClassDef = Prefix.andr + "SourceClassDef";
+        public final static String SourceClassDef = Prefix.andr + "SourceClassDef";
         public final static String DataDef = Prefix.andr + "DataDef";
         public final static String classToLocPath = Prefix.andr + "classToLocPath";
         public final static String lat = Prefix.andr + "lat";
