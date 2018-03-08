@@ -1,10 +1,10 @@
 package cz.melkamar.andruian.indexer.endpoint;
 
-import cz.melkamar.andruian.indexer.dao.DataDefDAO;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.Property;
+import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +20,16 @@ import java.util.Random;
 public class AdminEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminEndpoint.class);
 
-    private final DataDefDAO dataDefDAO;
+    private final DataDefFetcher dataDefFetcher;
     private final IndexService indexService;
     private final PlaceDAO placeDao;
     private final Random random = new Random();
 
     @Autowired
-    public AdminEndpoint(DataDefDAO dataDefDAO,
+    public AdminEndpoint(DataDefFetcher dataDefFetcher,
                          IndexService indexService,
                          PlaceDAO placeDao) {
-        this.dataDefDAO = dataDefDAO;
+        this.dataDefFetcher = dataDefFetcher;
         this.indexService = indexService;
         this.placeDao = placeDao;
     }
@@ -41,7 +41,7 @@ public class AdminEndpoint {
         LOGGER.info("Reindex uri: '{}'. Full reindex: {}", dataDefUri, fullReindex);
 
         if (dataDefUri != null && dataDefUri.length() > 0) {
-            DataDef dataDef = dataDefDAO.getDataDefFromUri(dataDefUri);
+            DataDef dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
             indexService.indexDataDef(dataDef, fullReindex);
             return "Refreshing " + dataDefUri;
         } else {

@@ -3,14 +3,15 @@ package cz.melkamar.andruian.indexer.rdf.sparql;
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.model.datadef.PropertyPath;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
+import cz.melkamar.andruian.indexer.rdf.IndexSparqlQueryBuilder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class IndexQueryBuilderTest {
+public class IndexSparqlQueryBuilderTest {
     @Test
     public void build() throws Exception {
-        IndexQueryBuilder builder = new IndexQueryBuilder(
+        IndexSparqlQueryBuilder builder = new IndexSparqlQueryBuilder(
                 "[dataclassuri]",
                 new PropertyPath("a","b","c"),
                 "[locsparql]",

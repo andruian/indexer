@@ -1,8 +1,8 @@
 package cz.melkamar.andruian.indexer.rdf;
 
-import cz.melkamar.andruian.indexer.dao.DataDefDAO;
 import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.model.datadef.*;
+import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DataDefParser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataDefDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataDefFetcher.class);
 
     private final Model model;
 

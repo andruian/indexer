@@ -1,14 +1,14 @@
 package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
-import cz.melkamar.andruian.indexer.dao.DataDefDAO;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.SolrPlace;
-import cz.melkamar.andruian.indexer.rdf.SparqlConnector;
-import cz.melkamar.andruian.indexer.rdf.sparql.IndexQueryBuilder;
+import cz.melkamar.andruian.indexer.net.DataDefFetcher;
+import cz.melkamar.andruian.indexer.net.SparqlConnector;
+import cz.melkamar.andruian.indexer.rdf.IndexSparqlQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +23,17 @@ public class IndexService {
     private final static Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
 
     private final IndexerConfiguration indexerConfiguration;
-    private final DataDefDAO dataDefDAO;
+    private final DataDefFetcher dataDefFetcher;
     private final SparqlConnector sparqlConnector;
     private final PlaceDAO placeDAO;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
-                        DataDefDAO dataDefDAO,
+                        DataDefFetcher dataDefFetcher,
                         SparqlConnector sparqlConnector,
                         PlaceDAO placeDAO) {
         this.indexerConfiguration = indexerConfiguration;
-        this.dataDefDAO = dataDefDAO;
+        this.dataDefFetcher = dataDefFetcher;
         this.sparqlConnector = sparqlConnector;
         this.placeDAO = placeDAO;
     }
@@ -61,7 +61,7 @@ public class IndexService {
         LOGGER.info("Indexing data from DataDef {}. Full reindex: {}", dataDef.getUri(), fullReindex);
 
         // Indexing stuff here
-        IndexQueryBuilder queryBuilder = new IndexQueryBuilder(
+        IndexSparqlQueryBuilder queryBuilder = new IndexSparqlQueryBuilder(
                 dataDef.getDataClassDef().getClassUri(),
                 dataDef.getDataClassDef().getPathToLocationClass(),
                 dataDef.getLocationDef().getSparqlEndpoint(),
@@ -102,7 +102,7 @@ public class IndexService {
 
         String[] dataDefUris = indexerConfiguration.getDataDefUris();
         for (String dataDefUri : dataDefUris) {
-            DataDef dataDef = dataDefDAO.getDataDefFromUri(dataDefUri);
+            DataDef dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
             if (dataDef == null) {
                 LOGGER.error("Could not get or parse DataDef from URL: {}", dataDefUri);
                 continue;

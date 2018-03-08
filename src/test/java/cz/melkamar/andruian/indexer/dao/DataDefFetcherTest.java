@@ -2,6 +2,7 @@ package cz.melkamar.andruian.indexer.dao;
 
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
+import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,13 +19,13 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class DataDefDAOTest {
+public class DataDefFetcherTest {
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
-    private DataDefDAO dataDefDAO;
+    private DataDefFetcher dataDefFetcher;
 
     MockRestServiceServer mockServer;
 
@@ -44,7 +45,7 @@ public class DataDefDAOTest {
                 .expect(MockRestRequestMatchers.requestTo(testUri))
                 .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));
 
-        DataDef dataDef = dataDefDAO.getDataDefFromUri(testUri);
+        DataDef dataDef = dataDefFetcher.getDataDefFromUri(testUri);
         assertEquals("http://foo/dataDef", dataDef.getUri());
     }
 

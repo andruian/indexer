@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.dao;
+package cz.melkamar.andruian.indexer.net;
 
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.rdf.DataDefParser;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class DataDefDAO {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataDefDAO.class);
+public class DataDefFetcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataDefFetcher.class);
     private final RestTemplate restTemplate;
 
     @Autowired
-    public DataDefDAO(RestTemplate restTemplate) {
+    public DataDefFetcher(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 

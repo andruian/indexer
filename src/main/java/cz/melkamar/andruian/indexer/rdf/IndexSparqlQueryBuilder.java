@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.rdf.sparql;
+package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.exception.ReservedNameUsedException;
@@ -11,19 +11,19 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 
-public class IndexQueryBuilder extends SparqlQueryBuilder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SparqlQueryBuilder.class);
+public class IndexSparqlQueryBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexSparqlQueryBuilder.class);
     public static final String TEMPLATE_PATH = "templates/sparql/indexquery.sparql";
     public static final Set<String> RESERVED_VAR_NAMES = new HashSet<>(Arrays.asList("dataObj",
                                                                                      "locationObj",
                                                                                      "lat",
                                                                                      "long"));
 
-    public IndexQueryBuilder(String dataClassUri,
-                             PropertyPath dataToLocationClassPropPath,
-                             String locationSparqlEndpoint,
-                             PropertyPath locClassToLatPropPath,
-                             PropertyPath locClassToLongPropPath) {
+    public IndexSparqlQueryBuilder(String dataClassUri,
+                                   PropertyPath dataToLocationClassPropPath,
+                                   String locationSparqlEndpoint,
+                                   PropertyPath locClassToLatPropPath,
+                                   PropertyPath locClassToLongPropPath) {
         this.dataClassUri = dataClassUri;
         this.dataToLocationClassPropPath = dataToLocationClassPropPath;
         this.locationSparqlEndpoint = locationSparqlEndpoint;
@@ -52,7 +52,6 @@ public class IndexQueryBuilder extends SparqlQueryBuilder {
         excludeDataObjUris.add(excludeUri);
     }
 
-    @Override
     public String build() {
         LOGGER.info("Building an index SPARQL query from template {}", TEMPLATE_PATH);
         String queryTemplate;

@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.rdf;
+package cz.melkamar.andruian.indexer.net;
 
 
 import cz.melkamar.andruian.indexer.model.place.Place;
