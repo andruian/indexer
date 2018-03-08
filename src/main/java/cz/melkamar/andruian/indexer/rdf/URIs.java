@@ -20,6 +20,7 @@ public class URIs {
         public final static String SourceClassDef = Prefix.andr + "SourceClassDef";
         public final static String DataDef = Prefix.andr + "DataDef";
         public final static String classToLocPath = Prefix.andr + "classToLocPath";
+        public final static String locationClassPathsSource = Prefix.andr + "locationClassPathsSource";
         public final static String lat = Prefix.andr + "lat";
         public final static String _long = Prefix.andr + "long";
         public final static String locationDef = Prefix.andr + "locationDef";

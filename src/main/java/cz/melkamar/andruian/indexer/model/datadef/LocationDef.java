@@ -3,20 +3,20 @@ package cz.melkamar.andruian.indexer.model.datadef;
 import java.util.Map;
 
 public class LocationDef extends ClassDef {
-    private final Map<String, ClassToCoordPropPath> pathsToGps;
+    private final Map<String, ClassToLocPath> pathsToGps;
 
     public LocationDef(String sparqlEndpoint,
                        String classUri,
-                       Map<String, ClassToCoordPropPath> pathsToGps) {
+                       Map<String, ClassToLocPath> pathsToGps) {
         super(sparqlEndpoint, classUri);
         this.pathsToGps = pathsToGps;
     }
 
-    public Map<String, ClassToCoordPropPath> getPathsToGps() {
+    public Map<String, ClassToLocPath> getPathsToGps() {
         return pathsToGps;
     }
 
-    public ClassToCoordPropPath getPathToGps(String locationClassUri) {
+    public ClassToLocPath getPathToGps(String locationClassUri) {
         return pathsToGps.get(locationClassUri);
     }
 }

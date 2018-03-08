@@ -109,18 +109,43 @@ public class DataDefParser {
                 .getResource()
                 .toString();
 
-        Map<String, ClassToCoordPropPath> locPathsMap = new HashMap<>();
-        StmtIterator pathDefs = locationDef.listProperties(new PropertyImpl(URIs.ANDR.classToLocPath));
-        // TODO schema format changed! there is not LocationClassPathsSource class inbetween LocationDef and ClassToLocPath
-        while (pathDefs.hasNext()) {
-            Resource pathDef = pathDefs.nextStatement().getResource();
+        Map<String, ClassToLocPath> locPathsMap = new HashMap<>();
+
+        // Parse direct links of andr:classToLocPath
+        locPathsMap.putAll(collectClassToLocPathsFromObject(locationDef));
+
+
+        // Parse indirect links of andr:locationClassPathsSource
+        StmtIterator locationClassPathsSourcesIter = locationDef.listProperties(
+                new PropertyImpl(URIs.ANDR.locationClassPathsSource));
+        while (locationClassPathsSourcesIter.hasNext()) {
+            Resource locationClassPathsSource = locationClassPathsSourcesIter.nextStatement().getResource();
+            locPathsMap.putAll(collectClassToLocPathsFromObject(locationClassPathsSource));
+        }
+
+        return new LocationDef(sparqlEndpoint, locClass, locPathsMap);
+    }
+
+    /**
+     * Given a Resource, collect all {@link ClassToLocPath} objects linked to the Resource via the
+     * andr:classToLocPath property.
+     *
+     * @param resource A resource to collect. Will be an andr:LocationClassDef or an andr:LocationClassPathsSource.
+     * @return Map of class URI to {@link ClassToLocPath}.
+     */
+    private Map<String, ClassToLocPath> collectClassToLocPathsFromObject(Resource resource) {
+        StmtIterator iterator = resource.listProperties(new PropertyImpl(URIs.ANDR.classToLocPath));
+        Map<String, ClassToLocPath> result = new HashMap<>();
+
+        while (iterator.hasNext()) {
+            Resource pathDef = iterator.nextStatement().getResource();
             String pdClass = pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._class)).toString();
             PropertyPath latPath = parsePropertyPath(pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.lat)));
             PropertyPath longPath = parsePropertyPath(pathDef.getPropertyResourceValue(new PropertyImpl(URIs.ANDR._long)));
-            ClassToCoordPropPath classToCoordPropPath = new ClassToCoordPropPath(latPath, longPath, pdClass);
-            locPathsMap.put(pdClass, classToCoordPropPath);
+            ClassToLocPath classToLocPath = new ClassToLocPath(latPath, longPath, pdClass);
+            result.put(pdClass, classToLocPath);
         }
-        return new LocationDef(sparqlEndpoint, locClass, locPathsMap);
+        return result;
     }
 
     public String getResourceType(Resource resource) {

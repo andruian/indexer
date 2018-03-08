@@ -2,7 +2,7 @@ package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
-import cz.melkamar.andruian.indexer.model.datadef.ClassToCoordPropPath;
+import cz.melkamar.andruian.indexer.model.datadef.ClassToLocPath;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.datadef.SourceClassDef;
@@ -13,12 +13,11 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DataDefParserTest {
     Model datadefModel;
-
+    
     @Before
     public void initRdfModel() throws FileNotFoundException {
         datadefModel = Util.readModelFromResource("rdf/test-parse-datadef.ttl", this.getClass());
@@ -88,7 +87,28 @@ public class DataDefParserTest {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
-        ClassToCoordPropPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
+        assertEquals(URIs.Prefix.s + "geo", paths.getLatCoord().getPathElements()[1]);
+        assertEquals(URIs.Prefix.s + "latitude", paths.getLatCoord().getPathElements()[2]);
+
+        assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLongCoord().getPathElements()[0]);
+        assertEquals(URIs.Prefix.s + "geo", paths.getLongCoord().getPathElements()[1]);
+        assertEquals(URIs.Prefix.s + "longitude", paths.getLongCoord().getPathElements()[2]);
+    }
+
+    /**
+     * Parse a DataDef that has a locationClassPathsSource containing ClassToLocPath.
+     */
+    @Test
+    public void parseLocationClassPathsSource() throws DataDefFormatException, FileNotFoundException {
+        Model datadefModel = Util.readModelFromResource("rdf/test-parse-datadef-locationClassPathsSource.ttl", this.getClass());
+        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDef dataDef = dataDefParser.parse();
+
+        ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
+        assertNotNull(paths);
+        
         assertEquals(URIs.Prefix.ruian + "adresniBod", paths.getLatCoord().getPathElements()[0]);
         assertEquals(URIs.Prefix.s + "geo", paths.getLatCoord().getPathElements()[1]);
         assertEquals(URIs.Prefix.s + "latitude", paths.getLatCoord().getPathElements()[2]);
