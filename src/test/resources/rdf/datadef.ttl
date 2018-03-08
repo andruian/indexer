@@ -8,13 +8,13 @@
 :dataDef
     a                 andr:DataDef;
     andr:locationDef  :locationDef;
-    andr:dataClassDef :dataClassDef;
+    andr:sourceClassDef :sourceClassDef;
     .
 
 #
 # DATA DEFINITION
 #
-:dataClassDef
+:sourceClassDef
     a                        andr:DataClassDef;
     andr:sparqlEndpoint      <http://localhost:3030/test/query>;
     andr:class               ex:MyObject;

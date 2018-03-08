@@ -2,14 +2,14 @@ package cz.melkamar.andruian.indexer.model.datadef;
 
 import java.util.Arrays;
 
-public class DataClassDef extends ClassDef {
+public class SourceClassDef extends ClassDef {
     private final PropertyPath pathToLocationClass;
     private final SelectProperty[] selectProperties;
 
-    public DataClassDef(String sparqlEndpoint,
-                        String classUri,
-                        PropertyPath pathToLocationClass,
-                        SelectProperty[] selectProperties) {
+    public SourceClassDef(String sparqlEndpoint,
+                          String classUri,
+                          PropertyPath pathToLocationClass,
+                          SelectProperty[] selectProperties) {
         super(sparqlEndpoint, classUri);
         this.pathToLocationClass = pathToLocationClass;
         this.selectProperties = selectProperties;
@@ -29,7 +29,7 @@ public class DataClassDef extends ClassDef {
 
     @Override
     public String toString() {
-        return "DataClassDef{" +
+        return "SourceClassDef{" +
                 "pathToLocationClass=" + pathToLocationClass +
                 ", selectProperties=" + Arrays.toString(selectProperties) +
                 ", sparqlEndpoint='" + sparqlEndpoint + '\'' +

@@ -62,19 +62,19 @@ public class IndexService {
 
         // Indexing stuff here
         IndexSparqlQueryBuilder queryBuilder = new IndexSparqlQueryBuilder(
-                dataDef.getDataClassDef().getClassUri(),
-                dataDef.getDataClassDef().getPathToLocationClass(),
+                dataDef.getSourceClassDef().getClassUri(),
+                dataDef.getSourceClassDef().getPathToLocationClass(),
                 dataDef.getLocationDef().getSparqlEndpoint(),
                 dataDef.getLocationDef().getPathToGps(dataDef.getLocationDef().getClassUri()).getLatCoord(),
                 dataDef.getLocationDef().getPathToGps(dataDef.getLocationDef().getClassUri()).getLongCoord()
         );
 
-        for (SelectProperty selectProperty : dataDef.getDataClassDef().getSelectProperties()) {
+        for (SelectProperty selectProperty : dataDef.getSourceClassDef().getSelectProperties()) {
             queryBuilder.addSelectProperty(selectProperty);
         }
 
         if (!fullReindex) {  
-            for (Place place: placeDAO.getPlacesOfClass(dataDef.getDataClassDef().getClassUri())) {
+            for (Place place: placeDAO.getPlacesOfClass(dataDef.getSourceClassDef().getClassUri())) {
                 queryBuilder.excludeUri(place.getUri());
             }
         }
@@ -83,8 +83,8 @@ public class IndexService {
         String query = queryBuilder.build();
         LOGGER.debug("Query string: \n{}", query);
         List<Place> places = sparqlConnector.executeIndexQuery(query,
-                                                               dataDef.getDataClassDef().getSparqlEndpoint(),
-                                                               dataDef.getDataClassDef().getSelectPropertiesNames());
+                                                               dataDef.getSourceClassDef().getSparqlEndpoint(),
+                                                               dataDef.getSourceClassDef().getSelectPropertiesNames());
 
         LOGGER.info("Indexed {} places from DataDef at {}:", places.size(), dataDef.getUri());
         for (Place place : places) {

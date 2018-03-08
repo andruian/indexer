@@ -2,9 +2,9 @@ package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.model.datadef.ClassToCoordPropPath;
-import cz.melkamar.andruian.indexer.model.datadef.DataClassDef;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
+import cz.melkamar.andruian.indexer.model.datadef.SourceClassDef;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.junit.Before;
@@ -40,20 +40,20 @@ public class DataDefParserTest {
     @Test
     public void parsePathToLocationClass() {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
-        Resource dataClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "dataClassDef");
-        DataClassDef dataClassDef = dataDefParser.parseDataClassDef(dataClassDefResource);
+        Resource dataClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
+        SourceClassDef sourceClassDef = dataDefParser.parseDataClassDef(dataClassDefResource);
 
         assertEquals("<http://example.org/linksTo>/<http://example.org/linksTo2>/<http://example.org/linksTo3>",
-                     dataClassDef.getPathToLocationClass().toString());
+                     sourceClassDef.getPathToLocationClass().toString());
     }
 
     @Test
     public void parseSelectProperties() {
         DataDefParser dataDefParser = new DataDefParser(datadefModel);
-        Resource dataClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "dataClassDef");
-        DataClassDef dataClassDef = dataDefParser.parseDataClassDef(dataClassDefResource);
+        Resource dataClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
+        SourceClassDef sourceClassDef = dataDefParser.parseDataClassDef(dataClassDefResource);
 
-        SelectProperty[] selectProperties = dataClassDef.getSelectProperties();
+        SelectProperty[] selectProperties = sourceClassDef.getSelectProperties();
         assertEquals(2, selectProperties.length);
 
         for (SelectProperty selectProperty : selectProperties) {

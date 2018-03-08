@@ -35,9 +35,9 @@ public class DataDefParser {
             LocationDef locationDef = parseLocationDef(locationClassDefResource);
 
             Resource dataClassDefResource = dataDefResource.getPropertyResourceValue(new PropertyImpl(URIs.ANDR.dataClassDef));
-            DataClassDef dataClassDef = parseDataClassDef(dataClassDefResource);
+            SourceClassDef sourceClassDef = parseDataClassDef(dataClassDefResource);
 
-            DataDef dataDef = new DataDef(dataDefResource.getURI(), locationDef, dataClassDef);
+            DataDef dataDef = new DataDef(dataDefResource.getURI(), locationDef, sourceClassDef);
             LOGGER.debug("Parsed dataDef: {}", dataDef);
             return dataDef; // todo this should be better
         }
@@ -50,7 +50,7 @@ public class DataDefParser {
      * @param dataClassDefResource
      * @return
      */
-    public DataClassDef parseDataClassDef(Resource dataClassDefResource) {
+    public SourceClassDef parseDataClassDef(Resource dataClassDefResource) {
         String sparqlEndpointURI = dataClassDefResource.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
                 .getResource()
                 .toString();
@@ -65,8 +65,8 @@ public class DataDefParser {
                 URIs.ANDR.pathToLocationClass)));
 
 
-        DataClassDef dataClassDef = new DataClassDef(sparqlEndpointURI, classURI, propertyPath, selectProperties);
-        return dataClassDef;
+        SourceClassDef sourceClassDef = new SourceClassDef(sparqlEndpointURI, classURI, propertyPath, selectProperties);
+        return sourceClassDef;
     }
 
     /**

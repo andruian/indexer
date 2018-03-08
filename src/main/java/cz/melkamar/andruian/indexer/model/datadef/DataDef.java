@@ -3,14 +3,14 @@ package cz.melkamar.andruian.indexer.model.datadef;
 public class DataDef {
     private final String uri;
     private final LocationDef locationDef;
-    private final DataClassDef dataClassDef;
+    private final SourceClassDef sourceClassDef;
 
     public DataDef(String uri,
                    LocationDef locationDef,
-                   DataClassDef dataClassDef) {
+                   SourceClassDef sourceClassDef) {
         this.uri = uri;
         this.locationDef = locationDef;
-        this.dataClassDef = dataClassDef;
+        this.sourceClassDef = sourceClassDef;
     }
 
     public String getUri() {
@@ -21,8 +21,8 @@ public class DataDef {
         return locationDef;
     }
 
-    public DataClassDef getDataClassDef() {
-        return dataClassDef;
+    public SourceClassDef getSourceClassDef() {
+        return sourceClassDef;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class DataDef {
         return "DataDef{" +
                 "uri='" + uri + '\'' +
                 ", locationDef=" + locationDef +
-                ", dataClassDef=" + dataClassDef +
+                ", sourceClassDef=" + sourceClassDef +
                 '}';
     }
 }

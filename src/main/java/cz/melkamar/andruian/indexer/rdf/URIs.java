@@ -17,7 +17,7 @@ public class URIs {
         public final static String _class = Prefix.andr + "class";
         public final static String pathToLocationClass = Prefix.andr + "pathToLocationClass";
         public final static String selectProperty = Prefix.andr + "selectProperty";
-        public final static String DataClassDef = Prefix.andr + "DataClassDef";
+        public final static String DataClassDef = Prefix.andr + "SourceClassDef";
         public final static String DataDef = Prefix.andr + "DataDef";
         public final static String classToLocPath = Prefix.andr + "classToLocPath";
         public final static String lat = Prefix.andr + "lat";
