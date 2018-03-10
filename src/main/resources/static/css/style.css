@@ -1,0 +1,24 @@
+body {
+    padding-top: 65px;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background-color: grey;
+}
+
+#maprow{
+    height: 600px;
+    display: flex;
+}
+
+#mapform{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#mapform form{
+    width:100%;
+}

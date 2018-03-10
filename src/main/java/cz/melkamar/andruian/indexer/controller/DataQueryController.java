@@ -1,8 +1,8 @@
 package cz.melkamar.andruian.indexer.controller;
 
-import cz.melkamar.andruian.indexer.dao.PlaceDAO;
+import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
+import cz.melkamar.andruian.indexer.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,11 +12,11 @@ import java.util.List;
 
 @RestController
 public class DataQueryController {
-    private final PlaceDAO placeDAO;
+    private final QueryService queryService;
 
     @Autowired
-    public DataQueryController(PlaceDAO placeDAO) {
-        this.placeDAO = placeDAO;
+    public DataQueryController(QueryService queryService) {
+        this.queryService = queryService;
     }
 
     @RequestMapping("/query")
@@ -27,23 +27,17 @@ public class DataQueryController {
             @RequestParam(value = "r", required = false) Double radius,
             @RequestParam(value = "count", required = false) boolean showCount
             ) {
-        List<Place> data;
-        if (type == null || type.isEmpty()){
-            if (checkLatLongR(latitude, longitude, radius)) data = placeDAO.getPlacesAroundPoint(latitude, longitude, radius);
-            else data = placeDAO.getAllPlaces();
-        } else { // type not null
-            if (checkLatLongR(latitude, longitude, radius)) data = placeDAO.getPlacesAroundPointOfClass(type, latitude, longitude, radius);
-            else data = placeDAO.getPlacesOfClass(type);
+        try {
+            List<Place> places = queryService.query(type, latitude, longitude, radius);
+            if (showCount) return places.size();
+            else return places;
+        } catch (QueryFormatException e) {
+            e.printStackTrace();
+            return e.toString(); // TODO show error page?
         }
-        if (showCount) return data.size();
-        else return data;
     }
     
-    private boolean checkLatLongR(Double latitude, Double longitude, Double radius){
-        if (latitude==null &&longitude==null && radius == null) return false;
-        if (latitude!=null &&longitude!=null && radius != null) return true;
-        throw new ValueException("All of 'lat', 'long' and 'r' must be either provided or not provided.");
-    }
+    
 
 //    @RequestMapping("/config")
 //    public String[] config(){

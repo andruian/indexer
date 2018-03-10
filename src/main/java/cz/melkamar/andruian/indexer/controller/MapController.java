@@ -1,6 +1,8 @@
 package cz.melkamar.andruian.indexer.controller;
 
+import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
+import cz.melkamar.andruian.indexer.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,8 +19,12 @@ import java.util.stream.Collectors;
 public class MapController {
 
 
+    private final QueryService queryService;
+
     @Autowired
-    private DataQueryController queryController;
+    public MapController(QueryService queryService) {
+        this.queryService = queryService;
+    }
 
     @GetMapping("/")
     public String showMap(@RequestParam(value = "type", required = false) String type,
@@ -26,19 +32,24 @@ public class MapController {
                           @RequestParam(value = "long", required = false) Double longitude,
                           @RequestParam(value = "r", required = false) Double radius,
                           Model model) {
-        List<Place> places = (List<Place>) queryController.query(type,
-                                                                 latitude,
-                                                                 longitude,
-                                                                 radius, false);
-        List<Loc> l = places.stream()
-                .map(place -> new Loc(place.getLatPos(), place.getLongPos()))
-                .collect(Collectors.toList());
-        model.addAttribute("points", l);
-        model.addAttribute("queryAttrs", new QueryAttrs(
-                type,
-                latitude,
-                longitude,
-                radius));
+
+        Errors errors = new Errors();
+
+        try {
+            List<Place> places = queryService.query(type, latitude, longitude, radius);
+            List<Loc> l = places.stream()
+                    .map(place -> new Loc(place.getLatPos(), place.getLongPos()))
+                    .collect(Collectors.toList());
+            model.addAttribute("points", l);
+
+        } catch (QueryFormatException e) {
+            e.printStackTrace();
+            errors.query = "An error occurred when executing the query. " + e.getMessage();
+        }
+        if (latitude != null && longitude != null) model.addAttribute("pos", new Loc(latitude, longitude));
+        model.addAttribute("queryAttrs", new QueryAttrs(type, latitude, longitude, radius));
+        model.addAttribute("errors", errors);
+
         return "map";
     }
 
@@ -99,6 +110,18 @@ public class MapController {
             this.lat = lat;
             this.longitude = longitude;
             this.radius = radius;
+        }
+    }
+
+    public class Errors {
+        private String query;
+
+        public String getQuery() {
+            return query;
+        }
+
+        public void setQuery(String query) {
+            this.query = query;
         }
     }
 }

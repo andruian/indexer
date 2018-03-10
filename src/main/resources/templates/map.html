@@ -3,34 +3,85 @@
       lang="en">
 <head>
     <title>Andruian indexer</title>
-    <style>
-        #map {
-            width: 100%;
-            height: 60%;
-            background-color: grey;
-        }
-    </style>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="map"></div>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#">Andruian index server</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Object search</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="https://github.com/andruian/indexer">Documentation</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
-<form action="#" th:action="@{/}" th:object="${queryAttrs}" method="get">
-    <p>type: <input type="text" th:field="*{type}" /></p>
-    <p>lat: <input       id="lat" type="text" th:field="*{lat}" /></p>
-    <p>longitude: <input id="long" type="text" th:field="*{long}" /></p>
-    <p>radius: <input type="text" th:field="*{r}" /></p>
-    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
-</form>
+<main role="main" class="container" style="padding-top: 16px">
+    <!--<div class="jumbotron">-->
+    <!--<h1>Navbar example</h1>-->
+    <!--<p class="lead">This example is a quick exercise to illustrate how fixed to top navbar works. As you scroll, it will remain fixed to the top of your browser's viewport.</p>-->
+    <!--<a class="btn btn-lg btn-primary" href="../../components/navbar/" role="button">View navbar docs &raquo;</a>-->
+    <!--</div>-->
+    <div class="row" id="maprow">
+        <div class="col-3 border" id="mapform">
+            <h4>Search indexed objects</h4>
+            <p th:if="${points} != null">
+                Objects shown: <span th:text="${points.size()}">0</span>
+            </p>
+
+            <div class="alert alert-danger" th:if="${errors != null && errors.query != null}" th:text="${errors.query}">
+                An error occurred when executing the query.
+            </div>
+            
+            <form action="#" th:action="@{/}" th:object="${queryAttrs}" method="get">
+                <div class="form-group">
+                    <label for="type">Type:</label>
+                    <input id="type" type="text" class="form-control" placeholder="http://resourcetype.org/class" th:field="*{type}"/>
+                </div>
+                <div class="form-group">
+                    <label for="lat">Latitude:</label>
+                    <input id="lat" type="text" class="form-control" placeholder="42.1234" th:field="*{lat}"/>
+                </div>
+                <div class="form-group">
+                    <label for="lng">Longitude:</label>
+                    <input id="lng" type="text" class="form-control" placeholder="3.141592" th:field="*{long}"/>
+                </div>
+                <div class="form-group">
+                    <label for="rad">Radius [km]:</label>
+                    <input id="rad" type="text" class="form-control" placeholder="235" th:field="*{r}"/>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Show" style="width: 100%;"/>
+            </form>
+        </div>
+        <div class="col-9">
+            <div id="map"></div>
+        </div>
+    </div>
+</main>
 
 
 <script th:inline="javascript">
     /*<![CDATA[*/
     function fillMap() {
         var points = /*[[${points}]]*/ 'default';
-        console.log(points);
-
         var centerMap = {lat: 49.747900, lng: 13.387498};
-        if (points.length !== 0) {
+        var pos = /*[[${pos}]]*/ centerMap;
+        console.log(points);
+        
+        if (points !== null && points.length !== 0) {
             centerMap = points[0]
         }
 
@@ -40,19 +91,24 @@
             center: centerMap
         });
 
-        if (!points.empty) {
+        if (points !== null && !points.empty) {
             var markers = points.map(
                 function (location, i) {
                     return new google.maps.Marker({
                         position: location,
-                        map: map
+                        map: map,
                     });
                 });
         }
+        new google.maps.Marker({
+            position: pos,
+            map: map,
+            icon: "img/green-marker.png"
+        });
 
-        google.maps.event.addListener(map, 'click', function( event ){
-            document.getElementById("lat").value = event.latLng.lat()
-            document.getElementById("long").value = event.latLng.lng()
+        google.maps.event.addListener(map, 'click', function (event) {
+            document.getElementById("lat").value = event.latLng.lat();
+            document.getElementById("lng").value = event.latLng.lng();
         });
     }
 
