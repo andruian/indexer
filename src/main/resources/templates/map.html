@@ -1,0 +1,66 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <title>Andruian indexer</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 60%;
+            background-color: grey;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<form action="#" th:action="@{/}" th:object="${queryAttrs}" method="get">
+    <p>type: <input type="text" th:field="*{type}" /></p>
+    <p>lat: <input       id="lat" type="text" th:field="*{lat}" /></p>
+    <p>longitude: <input id="long" type="text" th:field="*{long}" /></p>
+    <p>radius: <input type="text" th:field="*{r}" /></p>
+    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+</form>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function fillMap() {
+        var points = /*[[${points}]]*/ 'default';
+        console.log(points);
+
+        var centerMap = {lat: 49.747900, lng: 13.387498};
+        if (points.length !== 0) {
+            centerMap = points[0]
+        }
+
+        console.info(centerMap);
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 8,
+            center: centerMap
+        });
+
+        if (!points.empty) {
+            var markers = points.map(
+                function (location, i) {
+                    return new google.maps.Marker({
+                        position: location,
+                        map: map
+                    });
+                });
+        }
+
+        google.maps.event.addListener(map, 'click', function( event ){
+            document.getElementById("lat").value = event.latLng.lat()
+            document.getElementById("long").value = event.latLng.lng()
+        });
+    }
+
+    /*]]>*/
+</script>
+
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDla-1pHybD-AUUNeYuxGqFG_DdK-w3JgM&callback=fillMap">
+</script>
+
+</body>
