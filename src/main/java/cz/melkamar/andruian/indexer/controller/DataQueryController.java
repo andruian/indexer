@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.endpoint;
+package cz.melkamar.andruian.indexer.controller;
 
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class DataQueryEndpoint {
+public class DataQueryController {
     private final PlaceDAO placeDAO;
 
     @Autowired
-    public DataQueryEndpoint(PlaceDAO placeDAO) {
+    public DataQueryController(PlaceDAO placeDAO) {
         this.placeDAO = placeDAO;
     }
 

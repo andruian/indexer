@@ -43,10 +43,10 @@ public class IndexService {
     /**
      * Index data defined by the given DataDef object.
      * <p>
-     * Build a SPARQL query based on the {@link DataDef} and run this query on a data SPARQL endpoint.
+     * Build a SPARQL query based on the {@link DataDef} and run this query on a data SPARQL controller.
      * The query will select all objects of a type defined in the {@link DataDef} and find their linked
      * location objects and position coordinates (via a federated query, those objects may be accessible through a
-     * different endpoint - in the prototype version this will be the RÚIAN SPARQL endpoint).
+     * different controller - in the prototype version this will be the RÚIAN SPARQL controller).
      * <p>
      * Objects obtained by the query will be stored in Solr and MongoDB. Solr will only contain a stub of the
      * full representation - {@link SolrPlace}). This stub will contain location coordinates and a URI of the

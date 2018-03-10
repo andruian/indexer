@@ -55,7 +55,7 @@ public class SparqlConnector {
                 "  ?dataObj ex:id ?id.\n" +
                 "\n" +
                 "  #\n" +
-                "  # Federated query for the location sparql endpoint.\n" +
+                "  # Federated query for the location sparql controller.\n" +
                 "  #   [lat,long]LocationPathForLocationClass will contain a\n" +
                 "  #   property path from the Location class to its coordinates.\n" +
                 "  SERVICE <http://ruian.linked.opendata.cz/sparql> {\n" +

@@ -39,7 +39,7 @@ WHERE {
   {selectPropsMapping}
 
   #
-  # Federated query for the location sparql endpoint.
+  # Federated query for the location sparql controller.
   #   [lat,long]LocationPathForLocationClass will contain a
   #   property path from the Location class to its coordinates.
   SERVICE <{locationSparqlEndpoint}> {

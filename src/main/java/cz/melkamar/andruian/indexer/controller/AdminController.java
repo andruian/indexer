@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.endpoint;
+package cz.melkamar.andruian.indexer.controller;
 
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
@@ -19,8 +19,8 @@ import java.util.Random;
 
 @RestController
 @RequestMapping(value = "/admin")
-public class AdminEndpoint {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminEndpoint.class);
+public class AdminController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
 
     private final DataDefFetcher dataDefFetcher;
     private final IndexService indexService;
@@ -28,9 +28,9 @@ public class AdminEndpoint {
     private final Random random = new Random();
 
     @Autowired
-    public AdminEndpoint(DataDefFetcher dataDefFetcher,
-                         IndexService indexService,
-                         PlaceDAO placeDao) {
+    public AdminController(DataDefFetcher dataDefFetcher,
+                           IndexService indexService,
+                           PlaceDAO placeDao) {
         this.dataDefFetcher = dataDefFetcher;
         this.indexService = indexService;
         this.placeDao = placeDao;
