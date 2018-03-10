@@ -24,6 +24,7 @@ public class URIs {
         public final static String lat = Prefix.andr + "lat";
         public final static String _long = Prefix.andr + "long";
         public final static String locationDef = Prefix.andr + "locationDef";
+        public final static String includeRdf = Prefix.andr + "includeRdf";
     }
 
     public static class SP {

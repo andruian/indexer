@@ -10,13 +10,31 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class DataDefParserTest {
     Model datadefModel;
+    
+    @Autowired
+    private DataDefParserFactory parserFactory;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Before
     public void initRdfModel() throws FileNotFoundException {
@@ -25,13 +43,13 @@ public class DataDefParserTest {
 
     @Test
     public void parseDoesNotThrowException() throws DataDefFormatException {
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         dataDefParser.parse();
     }
 
     @Test
     public void parseDataDefUri() throws DataDefFormatException {
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
         assertEquals("http://foo/dataDef", dataDef.getUri());
@@ -39,7 +57,7 @@ public class DataDefParserTest {
 
     @Test
     public void parsePathToLocationClass() {
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         Resource sourceClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
         SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(sourceClassDefResource);
 
@@ -49,7 +67,7 @@ public class DataDefParserTest {
 
     @Test
     public void parseSelectProperties() {
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         Resource sourceClassDefResource = datadefModel.getResource(URIs.Prefix.BLANK + "sourceClassDef");
         SourceClassDef sourceClassDef = dataDefParser.parseSourceClassDef(sourceClassDefResource);
 
@@ -71,7 +89,7 @@ public class DataDefParserTest {
 
     @Test
     public void parseLocationDef() throws DataDefFormatException {
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
         assertEquals("http://ruian.linked.opendata.cz/sparql", dataDef.getLocationDef().getSparqlEndpoint());
@@ -84,7 +102,7 @@ public class DataDefParserTest {
      */
     @Test
     public void parsePropertyPathLocClass() throws DataDefFormatException {
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
         ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
@@ -104,7 +122,7 @@ public class DataDefParserTest {
     public void parseLocationClassPathsSource() throws DataDefFormatException, FileNotFoundException {
         Model datadefModel = Util.readModelFromResource("rdf/test-parse-datadef-locationClassPathsSource.ttl",
                                                         this.getClass());
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
         ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");
@@ -124,10 +142,18 @@ public class DataDefParserTest {
      * Test that an external RDF linked via andr:includeRdf is included properly
      */
     @Test
-    public void parseExternalLocationClassPathsSource() throws DataDefFormatException, FileNotFoundException {
+    public void parseExternalLocationClassPathsSource() throws DataDefFormatException, IOException {
+        MockRestServiceServer mockServer = MockRestServiceServer.createServer(restTemplate);
+        String includeUri = "http://example.org/some-rdf.ttl";
+        String payload = Util.readStringFromResource("rdf/test-external-locationclasspathssource.ttl", this.getClass());
+        mockServer
+                .expect(MockRestRequestMatchers.requestTo(includeUri))
+                .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));
+        
+        
         Model datadefModel = Util.readModelFromResource("rdf/test-parse-datadef-links-to-extern-rdf.ttl",
                                                         this.getClass());
-        DataDefParser dataDefParser = new DataDefParser(datadefModel);
+        DataDefParser dataDefParser = parserFactory.createParser(datadefModel);
         DataDef dataDef = dataDefParser.parse();
 
         ClassToLocPath paths = dataDef.getLocationDef().getPathToGps(URIs.Prefix.ruian + "AdresniMisto");

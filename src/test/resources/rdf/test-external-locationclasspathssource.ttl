@@ -5,6 +5,12 @@
 @prefix ex: <http://example.org/>
 @prefix : <http://foo/>
 
+
+<http://example.org/adresniMistoClassToLocPathSource> 
+    a andr:LocationClassPathsSource;
+    andr:classToLocPath <http://example.org/adresniMistoClassToLocPath>;
+    . 
+
 # Description of how to get from object ruian:AdresniMisto to its lat/long coordinates
 <http://example.org/adresniMistoClassToLocPath>
     a          andr:ClassToLocPath;

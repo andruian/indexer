@@ -50,5 +50,5 @@
     andr:sparqlEndpoint <http://ruian.linked.opendata.cz/sparql>;
     andr:class          ruian:AdresniMisto;
     andr:includeRdf     <http://example.org/some-rdf.ttl>;
-    andr:locationClassPathsSource <http://example.org/adresniMistoClassToLocPath>; 
+    andr:locationClassPathsSource <http://example.org/adresniMistoClassToLocPathSource>; 
     .

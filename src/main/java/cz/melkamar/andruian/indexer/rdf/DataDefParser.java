@@ -2,8 +2,10 @@ package cz.melkamar.andruian.indexer.rdf;
 
 import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
 import cz.melkamar.andruian.indexer.exception.NotImplementedException;
+import cz.melkamar.andruian.indexer.exception.RdfFormatException;
 import cz.melkamar.andruian.indexer.model.datadef.*;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
+import cz.melkamar.andruian.indexer.net.RdfFetcher;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
@@ -19,9 +21,11 @@ public class DataDefParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDefFetcher.class);
 
     private final Model model;
+    private final RdfFetcher rdfFetcher;
 
-    public DataDefParser(Model model) {
+    public DataDefParser(Model model, RdfFetcher rdfFetcher) {
         this.model = model;
+        this.rdfFetcher = rdfFetcher;
     }
 
     public DataDef parse() throws DataDefFormatException {
@@ -95,12 +99,36 @@ public class DataDefParser {
     }
 
     /**
+     * Process all andr:inludeRdf properties linked from the given resource.
+     * Add data from the files to the current model.
+     *
+     * @param resource A resource to process.
+     */
+    public void processIncludeRdfs(Resource resource) {
+        StmtIterator includeRdfsIter = resource.listProperties(new PropertyImpl(URIs.ANDR.includeRdf));
+        while (includeRdfsIter.hasNext()) {
+            String includeRdfUri = includeRdfsIter.nextStatement().getResource().toString();
+            LOGGER.debug("Including {} in the current model", includeRdfUri);
+            
+            try {
+                Model addModel = this.rdfFetcher.getDataDefFromUri(includeRdfUri);
+                this.model.add(addModel);
+            } catch (RdfFormatException | DataDefFormatException e) {
+                LOGGER.error("Could not include " + includeRdfUri + " in the model", e);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Parse a LocationDef resource.
      *
      * @param locationDef
      * @return
      */
     public LocationDef parseLocationDef(Resource locationDef) {
+        processIncludeRdfs(locationDef);
+
         String sparqlEndpoint = locationDef.getProperty(new PropertyImpl(URIs.ANDR.sparqlEndpoint))
                 .getResource()
                 .toString();
@@ -114,13 +142,19 @@ public class DataDefParser {
         // Parse direct links of andr:classToLocPath
         locPathsMap.putAll(collectClassToLocPathsFromObject(locationDef));
 
-        // TODO how does this not crash?!
         // Parse indirect links of andr:locationClassPathsSource
         StmtIterator locationClassPathsSourcesIter = locationDef.listProperties(
                 new PropertyImpl(URIs.ANDR.locationClassPathsSource));
         while (locationClassPathsSourcesIter.hasNext()) {
             Resource locationClassPathsSource = locationClassPathsSourcesIter.nextStatement().getResource();
             locPathsMap.putAll(collectClassToLocPathsFromObject(locationClassPathsSource));
+            if (locPathsMap.isEmpty()) {
+                LOGGER.warn("No properties of type {} found for resource {}. If the resource is located in an " +
+                                    "external file, use the property {} to link to it.",
+                            URIs.ANDR.classToLocPath,
+                            locationClassPathsSource.toString(),
+                            URIs.ANDR.includeRdf);
+            }
         }
 
         return new LocationDef(sparqlEndpoint, locClass, locPathsMap);
