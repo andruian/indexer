@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Component
 public class PlaceDAO {
     private final static Logger LOGGER = LoggerFactory.getLogger(PlaceDAO.class);
-    
+
     private final MongoPlaceRepository mongoPlaceRepository;
     private final SolrPlaceRepository solrPlaceRepository;
 
@@ -39,16 +39,16 @@ public class PlaceDAO {
     }
 
     public void savePlace(Place place) {
-        LOGGER.debug("Indexing a place: "+place);
-        
+        LOGGER.debug("Indexing a place: " + place);
+
         solrPlaceRepository.save(new SolrPlace(place));
         mongoPlaceRepository.save(place);
     }
 
     public void savePlaces(List<Place> places) {
-        LOGGER.debug("Indexing "+places.size()+" places");
+        LOGGER.debug("Indexing " + places.size() + " places");
         if (places.isEmpty()) return;
-        
+
         solrPlaceRepository.saveAll(places.stream().map(SolrPlace::new).collect(Collectors.toList()));
         mongoPlaceRepository.saveAll(places);
     }
@@ -67,7 +67,14 @@ public class PlaceDAO {
     }
 
     public List<Place> getPlacesAroundPoint(double latCoord, double longCoord, double radius) {
-        throw new NotImplementedException();
+        List<SolrPlace> solrPlaces = solrPlaceRepository.findByLocationWithin(new Point(latCoord, longCoord),
+                                                                              new Distance(radius));
+        List<Place> result = new ArrayList<>(solrPlaces.size());
+        for (SolrPlace solrPlace : solrPlaces) {
+            mongoPlaceRepository.findByUri(solrPlace.getUri()).ifPresent(result::add);
+        }
+
+        return result;
     }
 
     public List<Place> getPlacesAroundPointOfClass(String classUri, double latCoord, double longCoord, double radius) {
@@ -75,10 +82,10 @@ public class PlaceDAO {
                                                                                      new Point(latCoord, longCoord),
                                                                                      new Distance(radius));
         List<Place> result = new ArrayList<>(solrPlaces.size());
-        for (SolrPlace solrPlace: solrPlaces){
+        for (SolrPlace solrPlace : solrPlaces) {
             mongoPlaceRepository.findByUri(solrPlace.getUri()).ifPresent(result::add);
         }
-        
+
         return result;
     }
 }

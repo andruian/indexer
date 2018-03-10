@@ -44,8 +44,8 @@ public class PostStartupService {
         }
 
 //        listStuff();
-        saveToMongo();
-        readFromMongo();
+//        saveToMongo();
+//        readFromMongo();
     }
 
     public void saveToMongo() {

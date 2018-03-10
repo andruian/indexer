@@ -1,5 +1,6 @@
 package cz.melkamar.andruian.indexer.controller;
 
+import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
 import cz.melkamar.andruian.indexer.exception.RdfFormatException;
@@ -25,15 +26,17 @@ public class AdminController {
     private final DataDefFetcher dataDefFetcher;
     private final IndexService indexService;
     private final PlaceDAO placeDao;
+    private final IndexerConfiguration configuration;
     private final Random random = new Random();
 
     @Autowired
     public AdminController(DataDefFetcher dataDefFetcher,
                            IndexService indexService,
-                           PlaceDAO placeDao) {
+                           PlaceDAO placeDao, IndexerConfiguration configuration) {
         this.dataDefFetcher = dataDefFetcher;
         this.indexService = indexService;
         this.placeDao = placeDao;
+        this.configuration = configuration;
     }
 
 
@@ -58,6 +61,11 @@ public class AdminController {
             indexService.reindexAll(fullReindex);
             return "Refreshing all.";
         }
+    }
+    
+    @RequestMapping("datadefs")
+    public Object listDatadefs(){
+        return configuration.getDataDefUris();
     }
 
     @RequestMapping("addFakeData")

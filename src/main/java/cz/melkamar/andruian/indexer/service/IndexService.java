@@ -4,6 +4,7 @@ import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
 import cz.melkamar.andruian.indexer.exception.RdfFormatException;
+import cz.melkamar.andruian.indexer.exception.SparqlQueryException;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -84,9 +85,16 @@ public class IndexService {
 
         String query = queryBuilder.build();
         LOGGER.debug("Query string: \n{}", query);
-        List<Place> places = sparqlConnector.executeIndexQuery(query,
-                                                               dataDef.getSourceClassDef().getSparqlEndpoint(),
-                                                               dataDef.getSourceClassDef().getSelectPropertiesNames());
+        List<Place> places = null;
+        try {
+            places = sparqlConnector.executeIndexQuery(query,
+                                                                   dataDef.getSourceClassDef().getSparqlEndpoint(),
+                                                                   dataDef.getSourceClassDef().getSelectPropertiesNames());
+        } catch (SparqlQueryException e) {
+            LOGGER.error("An error occurred while performing a SPARQL query on endpoint "+dataDef.getSourceClassDef().getSparqlEndpoint(), e);
+            e.printStackTrace();
+            return CompletableFuture.completedFuture(null); 
+        }
 
         LOGGER.info("Indexed {} places from DataDef at {}:", places.size(), dataDef.getUri());
         for (Place place : places) {

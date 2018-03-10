@@ -20,19 +20,23 @@ public class DataQueryController {
     }
 
     @RequestMapping("/query")
-    public List<Place> query(
+    public Object query(
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "lat", required = false) Double latitude,
             @RequestParam(value = "long", required = false) Double longitude,
-            @RequestParam(value = "r", required = false) Double radius
+            @RequestParam(value = "r", required = false) Double radius,
+            @RequestParam(value = "count", required = false) boolean showCount
             ) {
-        if (type == null){
-            if (checkLatLongR(latitude, longitude, radius)) return placeDAO.getPlacesAroundPoint(latitude, longitude, radius);
-            else return placeDAO.getAllPlaces();
+        List<Place> data;
+        if (type == null || type.isEmpty()){
+            if (checkLatLongR(latitude, longitude, radius)) data = placeDAO.getPlacesAroundPoint(latitude, longitude, radius);
+            else data = placeDAO.getAllPlaces();
         } else { // type not null
-            if (checkLatLongR(latitude, longitude, radius)) return placeDAO.getPlacesAroundPointOfClass(type, latitude, longitude, radius);
-            else return placeDAO.getPlacesOfClass(type);
+            if (checkLatLongR(latitude, longitude, radius)) data = placeDAO.getPlacesAroundPointOfClass(type, latitude, longitude, radius);
+            else data = placeDAO.getPlacesOfClass(type);
         }
+        if (showCount) return data.size();
+        else return data;
     }
     
     private boolean checkLatLongR(Double latitude, Double longitude, Double radius){
