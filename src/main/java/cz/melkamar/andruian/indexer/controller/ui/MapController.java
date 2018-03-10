@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.controller;
+package cz.melkamar.andruian.indexer.controller.ui;
 
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -49,7 +49,8 @@ public class MapController {
         if (latitude != null && longitude != null) model.addAttribute("pos", new Loc(latitude, longitude));
         model.addAttribute("queryAttrs", new QueryAttrs(type, latitude, longitude, radius));
         model.addAttribute("errors", errors);
-
+        model.addAttribute("module", "map");
+        
         return "map";
     }
 

@@ -12,29 +12,15 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">Andruian index server</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Object search</a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="https://github.com/andruian/indexer">Documentation</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="fragments/header.html :: header"></div>
 
 <main role="main" class="container" style="padding-top: 16px">
-    <!--<div class="jumbotron">-->
-    <!--<h1>Navbar example</h1>-->
-    <!--<p class="lead">This example is a quick exercise to illustrate how fixed to top navbar works. As you scroll, it will remain fixed to the top of your browser's viewport.</p>-->
-    <!--<a class="btn btn-lg btn-primary" href="../../components/navbar/" role="button">View navbar docs &raquo;</a>-->
-    <!--</div>-->
+    <div class="row">
+        <h2>Indexed objects search</h2>
+    </div>
+    <div class="row">
+        <hr style="width: 100%"/>
+    </div>
     <div class="row" id="maprow">
         <div class="col-3 border" id="mapform">
             <h4>Search indexed objects</h4>
@@ -45,7 +31,7 @@
             <div class="alert alert-danger" th:if="${errors != null && errors.query != null}" th:text="${errors.query}">
                 An error occurred when executing the query.
             </div>
-            
+
             <form action="#" th:action="@{/}" th:object="${queryAttrs}" method="get">
                 <div class="form-group">
                     <label for="type">Type:</label>
@@ -53,15 +39,15 @@
                 </div>
                 <div class="form-group">
                     <label for="lat">Latitude:</label>
-                    <input id="lat" type="text" class="form-control" placeholder="42.1234" th:field="*{lat}"/>
+                    <input id="lat" type="text" class="form-control" placeholder="Click on map for GPS" th:field="*{lat}"/>
                 </div>
                 <div class="form-group">
                     <label for="lng">Longitude:</label>
-                    <input id="lng" type="text" class="form-control" placeholder="3.141592" th:field="*{long}"/>
+                    <input id="lng" type="text" class="form-control" placeholder="Click on map for GPS" th:field="*{long}"/>
                 </div>
                 <div class="form-group">
                     <label for="rad">Radius [km]:</label>
-                    <input id="rad" type="text" class="form-control" placeholder="235" th:field="*{r}"/>
+                    <input id="rad" type="text" class="form-control" th:field="*{r}"/>
                 </div>
                 <input type="submit" class="btn btn-primary" value="Show" style="width: 100%;"/>
             </form>
@@ -78,11 +64,11 @@
     function fillMap() {
         var points = /*[[${points}]]*/ 'default';
         var centerMap = {lat: 49.747900, lng: 13.387498};
-        var pos = /*[[${pos}]]*/ centerMap;
+        var pos = /*[[${pos}]]*/ null;
         console.log(points);
-        
-        if (points !== null && points.length !== 0) {
-            centerMap = points[0]
+
+        if (pos !== null) {
+            centerMap = pos
         }
 
         console.info(centerMap);
@@ -100,15 +86,28 @@
                     });
                 });
         }
-        new google.maps.Marker({
-            position: pos,
-            map: map,
-            icon: "img/green-marker.png"
-        });
+
+        var currentPosMarker = null;
+        if (pos !== null) {
+            currentPosMarker = new google.maps.Marker({
+                position: pos,
+                map: map,
+                icon: "img/green-marker.png"
+            });
+        }
 
         google.maps.event.addListener(map, 'click', function (event) {
             document.getElementById("lat").value = event.latLng.lat();
             document.getElementById("lng").value = event.latLng.lng();
+            if (document.getElementById("rad").value === "") document.getElementById("rad").value = "10.0";
+            if (currentPosMarker !== null) currentPosMarker.setPosition(new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()))
+            else {
+                currentPosMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()),
+                    map: map,
+                    icon: "img/green-marker.png"
+                });
+            }
         });
     }
 

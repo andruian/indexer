@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.controller;
+package cz.melkamar.andruian.indexer.controller.rest;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Random;
 
 @RestController
-@RequestMapping(value = "/admin")
-public class AdminController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
+@RequestMapping(value = "/api/admin")
+public class AdminRestController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminRestController.class);
 
     private final DataDefFetcher dataDefFetcher;
     private final IndexService indexService;
@@ -30,9 +30,9 @@ public class AdminController {
     private final Random random = new Random();
 
     @Autowired
-    public AdminController(DataDefFetcher dataDefFetcher,
-                           IndexService indexService,
-                           PlaceDAO placeDao, IndexerConfiguration configuration) {
+    public AdminRestController(DataDefFetcher dataDefFetcher,
+                               IndexService indexService,
+                               PlaceDAO placeDao, IndexerConfiguration configuration) {
         this.dataDefFetcher = dataDefFetcher;
         this.indexService = indexService;
         this.placeDao = placeDao;

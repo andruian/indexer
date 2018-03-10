@@ -1,0 +1,61 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <title>Andruian indexer</title>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div th:replace="fragments/header.html :: header"></div>
+
+<main role="main" class="container" style="padding-top: 16px">
+    <div class="row">
+        <h2>Index server configuration</h2>
+    </div>
+    <div class="alert alert-success" th:if="${status != null && status.ok == true}" th:text="${status.message}">
+        Success.
+    </div>
+    <div class="row">
+        <hr style="width: 100%"/>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <h4>Reindex data</h4>
+            <form action="#" th:action="@{/admin/reindex}" th:object="${reindexOptions}" method="post">
+                <div class="form-group">
+                    <label for="select-datadef">Data source to reindex</label>
+                    <select class="form-control" id="select-datadef" th:field="*{datadef}">
+                        <option th:value="all">All</option>
+                        <option th:each="datadef : ${datadefs}" th:text="${datadef}" th:value="${datadef}">datadef url</option>
+                    </select>
+                </div>
+
+                <fieldset class="form-group">
+                    <label>Reindex type</label>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="radio" class="form-check-input" th:value="'incremental'" th:field="*{reindexType}">
+                            Incremental reindex - only add new data
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="radio" class="form-check-input" th:value="'full'" th:field="*{reindexType}">
+                            Full reindex - drop existing index
+                        </label>
+                    </div>
+                </fieldset>
+
+                <input type="submit" class="btn" value="Reindex"/>
+            </form>
+        </div>
+    </div>
+</main>
+
+</body>

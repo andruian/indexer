@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    ...
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" th:fragment="header">
+    <a class="navbar-brand" href="#">Andruian index server</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item" th:classappend="${module == 'map' ? 'active' : ''}">
+                <a class="nav-link" href="/">Object search</a>
+            </li>
+            <li class="nav-item" th:classappend="${module == 'config' ? 'active' : ''}">
+                <a class="nav-link" href="/config">Configuration</a>
+            </li>
+            <li class="nav-item" th:classappend="${module == 'admin' ? 'active' : ''}">
+                <a class="nav-link" href="/admin">Administration</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://github.com/andruian/indexer">Documentation</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+</body>
+</html>

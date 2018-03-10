@@ -1,4 +1,4 @@
-package cz.melkamar.andruian.indexer.controller;
+package cz.melkamar.andruian.indexer.controller.rest;
 
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -11,15 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class DataQueryController {
+@RequestMapping(value = "/api/query")
+public class DataQueryRestController {
     private final QueryService queryService;
 
     @Autowired
-    public DataQueryController(QueryService queryService) {
+    public DataQueryRestController(QueryService queryService) {
         this.queryService = queryService;
     }
 
-    @RequestMapping("/query")
+    @RequestMapping
     public Object query(
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "lat", required = false) Double latitude,
