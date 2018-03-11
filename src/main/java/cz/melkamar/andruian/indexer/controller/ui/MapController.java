@@ -1,5 +1,6 @@
 package cz.melkamar.andruian.indexer.controller.ui;
 
+import cz.melkamar.andruian.indexer.controller.Util;
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.service.QueryService;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -26,6 +28,11 @@ public class MapController {
         this.queryService = queryService;
     }
 
+    @ModelAttribute
+    public void addAttributes(Model model){
+        Util.addPrincipalAttribute(model);
+    }
+    
     @GetMapping("/")
     public String showMap(@RequestParam(value = "type", required = false) String type,
                           @RequestParam(value = "lat", required = false) Double latitude,

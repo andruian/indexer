@@ -11,6 +11,9 @@ public class IndexerConfiguration {
 
     public static final String DB_SOLR_URL = "db.solr.url";
     public static final String DB_SOLR_COLLECTION = "db.solr.collection";
+    
+    public static final String ADMIN_USERNAME = "admin.username";
+    public static final String ADMIN_PASSWORD = "admin.password";
 
     @Value("${" + DATADEFS + "}")
     private String[] dataDefs;
@@ -25,6 +28,11 @@ public class IndexerConfiguration {
     private String dbSolrUri;
     @Value("${" + DB_SOLR_COLLECTION + "}")
     private String dbSolrCollection;
+
+    @Value("${" + ADMIN_USERNAME + "}")
+    private String adminUsername;
+    @Value("${" + ADMIN_PASSWORD + "}")
+    private String adminPassword;
 
     public String[] getDataDefUris() {
         return dataDefs;
@@ -44,5 +52,13 @@ public class IndexerConfiguration {
 
     public String getDbSolrCollection() {
         return dbSolrCollection;
+    }
+
+    public String getAdminUsername() {
+        return adminUsername;
+    }
+
+    public String getAdminPassword() {
+        return adminPassword;
     }
 }

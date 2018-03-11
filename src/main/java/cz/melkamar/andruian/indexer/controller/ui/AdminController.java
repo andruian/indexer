@@ -1,6 +1,7 @@
 package cz.melkamar.andruian.indexer.controller.ui;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
+import cz.melkamar.andruian.indexer.controller.Util;
 import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
 import cz.melkamar.andruian.indexer.exception.RdfFormatException;
 import cz.melkamar.andruian.indexer.model.datadef.DataDef;
@@ -38,6 +39,7 @@ public class AdminController {
     public void addAttributes(Model model) {
         model.addAttribute("module", "admin");
         model.addAttribute("datadefs", indexerConfiguration.getDataDefUris());
+        Util.addPrincipalAttribute(model);
     }
 
     @GetMapping
