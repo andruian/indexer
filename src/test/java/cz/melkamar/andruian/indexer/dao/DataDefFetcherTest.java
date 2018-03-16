@@ -1,7 +1,7 @@
 package cz.melkamar.andruian.indexer.dao;
 
+import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.indexer.Util;
-import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +15,9 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
@@ -45,9 +48,10 @@ public class DataDefFetcherTest {
                 .expect(MockRestRequestMatchers.requestTo(testUri))
                 .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));
 
-        DataDef dataDef = dataDefFetcher.getDataDefsFromUri(testUri);
+        List<DataDef> dataDef = dataDefFetcher.getDataDefsFromUri(testUri);
         assertNotNull(dataDef);
-        assertEquals("http://foo/dataDef", dataDef.getUri());
+        assertEquals(1, dataDef.size());
+        assertEquals("http://foo/dataDef", dataDef.get(0).getUri());
     }
 
 }

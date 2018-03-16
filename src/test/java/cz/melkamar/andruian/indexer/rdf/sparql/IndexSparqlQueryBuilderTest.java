@@ -1,8 +1,8 @@
 package cz.melkamar.andruian.indexer.rdf.sparql;
 
+import cz.melkamar.andruian.ddfparser.model.PropertyPath;
+import cz.melkamar.andruian.ddfparser.model.SelectProperty;
 import cz.melkamar.andruian.indexer.Util;
-import cz.melkamar.andruian.indexer.model.datadef.PropertyPath;
-import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.rdf.IndexSparqlQueryBuilder;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ public class IndexSparqlQueryBuilderTest {
     public void build() throws Exception {
         IndexSparqlQueryBuilder builder = new IndexSparqlQueryBuilder(
                 "[dataclassuri]",
-                new PropertyPath("a","b","c"),
+                new PropertyPath("a", "b", "c"),
                 "[locsparql]",
                 new PropertyPath("path","to","lat"),
                 new PropertyPath("path","to","long")
