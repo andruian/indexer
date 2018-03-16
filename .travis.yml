@@ -1,3 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
+
+before_script:
+  - wget https://github.com/andruian/datadef-parser/archive/master.tar.gz -O /tmp/parser.tar.gz
+  - tar -xvf /tmp/parser.tar.gz
+  - pushd datadef-parser-master && ./gradlew publishToMavenLocal
