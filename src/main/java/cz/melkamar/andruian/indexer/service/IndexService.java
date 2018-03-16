@@ -1,12 +1,12 @@
 package cz.melkamar.andruian.indexer.service;
 
+import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
+import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
+import cz.melkamar.andruian.ddfparser.model.DataDef;
+import cz.melkamar.andruian.ddfparser.model.SelectProperty;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
-import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
-import cz.melkamar.andruian.indexer.exception.RdfFormatException;
 import cz.melkamar.andruian.indexer.exception.SparqlQueryException;
-import cz.melkamar.andruian.indexer.model.datadef.DataDef;
-import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.SolrPlace;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -67,9 +68,9 @@ public class IndexService {
         IndexSparqlQueryBuilder queryBuilder = new IndexSparqlQueryBuilder(
                 dataDef.getSourceClassDef().getClassUri(),
                 dataDef.getSourceClassDef().getPathToLocationClass(),
-                dataDef.getLocationDef().getSparqlEndpoint(),
-                dataDef.getLocationDef().getPathToGps(dataDef.getLocationDef().getClassUri()).getLatCoord(),
-                dataDef.getLocationDef().getPathToGps(dataDef.getLocationDef().getClassUri()).getLongCoord()
+                dataDef.getLocationClassDef().getSparqlEndpoint(),
+                dataDef.getLocationClassDef().getPathToGps(dataDef.getLocationClassDef().getClassUri()).getLatCoord(),
+                dataDef.getLocationClassDef().getPathToGps(dataDef.getLocationClassDef().getClassUri()).getLongCoord()
         );
 
         for (SelectProperty selectProperty : dataDef.getSourceClassDef().getSelectProperties()) {
@@ -88,12 +89,13 @@ public class IndexService {
         List<Place> places = null;
         try {
             places = sparqlConnector.executeIndexQuery(query,
-                                                                   dataDef.getSourceClassDef().getSparqlEndpoint(),
-                                                                   dataDef.getSourceClassDef().getSelectPropertiesNames());
+                                                       dataDef.getSourceClassDef().getSparqlEndpoint(),
+                                                       dataDef.getSourceClassDef().getSelectPropertiesNames());
         } catch (SparqlQueryException e) {
-            LOGGER.error("An error occurred while performing a SPARQL query on endpoint "+dataDef.getSourceClassDef().getSparqlEndpoint(), e);
+            LOGGER.error("An error occurred while performing a SPARQL query on endpoint " + dataDef.getSourceClassDef()
+                    .getSparqlEndpoint(), e);
             e.printStackTrace();
-            return CompletableFuture.completedFuture(null); 
+            return CompletableFuture.completedFuture(null);
         }
 
         LOGGER.info("Indexed {} places from DataDef at {}:", places.size(), dataDef.getUri());
@@ -112,16 +114,17 @@ public class IndexService {
 
         String[] dataDefUris = indexerConfiguration.getDataDefUris();
         for (String dataDefUri : dataDefUris) {
-            DataDef dataDef = null;
+            List<DataDef> dataDefs = null;
             try {
-                dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
-            } catch (RdfFormatException | DataDefFormatException e) {
+                dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefUri);
+            } catch (RdfFormatException | DataDefFormatException | IOException e) {
                 LOGGER.error("Could not get or parse DataDef from URL: {}", dataDefUri);
                 e.printStackTrace();
                 continue;
             }
-
-            indexDataDef(dataDef, fullReindex);
+            for (DataDef dataDef : dataDefs) {
+                indexDataDef(dataDef, fullReindex);
+            }
         }
     }
 }

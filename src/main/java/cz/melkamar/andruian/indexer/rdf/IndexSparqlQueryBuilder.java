@@ -1,9 +1,9 @@
 package cz.melkamar.andruian.indexer.rdf;
 
+import cz.melkamar.andruian.ddfparser.model.PropertyPath;
+import cz.melkamar.andruian.ddfparser.model.SelectProperty;
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.exception.ReservedNameUsedException;
-import cz.melkamar.andruian.indexer.model.datadef.PropertyPath;
-import cz.melkamar.andruian.indexer.model.datadef.SelectProperty;
 import cz.melkamar.andruian.indexer.thirdparty.MapFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

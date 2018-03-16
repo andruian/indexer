@@ -15,7 +15,6 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
@@ -46,7 +45,7 @@ public class DataDefFetcherTest {
                 .expect(MockRestRequestMatchers.requestTo(testUri))
                 .andRespond(MockRestResponseCreators.withSuccess(payload, MediaType.valueOf("text/plain")));
 
-        DataDef dataDef = dataDefFetcher.getDataDefFromUri(testUri);
+        DataDef dataDef = dataDefFetcher.getDataDefsFromUri(testUri);
         assertNotNull(dataDef);
         assertEquals("http://foo/dataDef", dataDef.getUri());
     }

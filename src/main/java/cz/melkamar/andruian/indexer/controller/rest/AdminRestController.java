@@ -1,10 +1,10 @@
 package cz.melkamar.andruian.indexer.controller.rest;
 
+import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
+import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
+import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
-import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
-import cz.melkamar.andruian.indexer.exception.RdfFormatException;
-import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.Property;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 @RestController
@@ -48,10 +50,12 @@ public class AdminRestController {
         if (dataDefUri != null && dataDefUri.length() > 0) {
             
             try {
-                DataDef dataDef = dataDefFetcher.getDataDefFromUri(dataDefUri);
-                indexService.indexDataDef(dataDef, fullReindex);
+                List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefUri);
+                for (DataDef dataDef : dataDefs) {
+                    indexService.indexDataDef(dataDef, fullReindex);
+                }
                 return "Refreshing " + dataDefUri;
-            } catch (RdfFormatException | DataDefFormatException e) {
+            } catch (RdfFormatException | DataDefFormatException |IOException e) {
                 e.printStackTrace();
                 return e.toString();
             }

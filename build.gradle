@@ -26,6 +26,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         url "https://repo.spring.io/libs-snapshot-local"
@@ -53,4 +54,6 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile("org.springframework.boot:spring-boot-starter-data-solr:2.0.0.RELEASE")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb:2.0.0.RELEASE")
+
+    compile('cz.melkamar.andruian:ddfparser:1.0.2')
 }

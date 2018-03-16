@@ -1,10 +1,10 @@
 package cz.melkamar.andruian.indexer.controller.ui;
 
+import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
+import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
+import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.controller.Util;
-import cz.melkamar.andruian.indexer.exception.DataDefFormatException;
-import cz.melkamar.andruian.indexer.exception.RdfFormatException;
-import cz.melkamar.andruian.indexer.model.datadef.DataDef;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
 import org.slf4j.Logger;
@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.StringUtils;
+
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -60,11 +63,13 @@ public class AdminController {
             indexService.reindexAll(reindexOptions.reindexType.equals("full"));
         } else {
             try {
-                DataDef dataDef = dataDefFetcher.getDataDefFromUri(reindexOptions.datadef);
+                List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(reindexOptions.datadef);
                 status.setOk(true);
                 status.setMessage(StringUtils.capitalize(reindexOptions.reindexType) + " reindexing started for " + reindexOptions.datadef);
-                indexService.indexDataDef(dataDef, reindexOptions.reindexType.equals("full"));
-            } catch (RdfFormatException | DataDefFormatException e) {
+                for (DataDef dataDef : dataDefs) {
+                    indexService.indexDataDef(dataDef, reindexOptions.reindexType.equals("full"));
+                }
+            } catch (RdfFormatException | DataDefFormatException | IOException e) {
                 LOGGER.error("An exception occurred when pulling datadef " + reindexOptions.datadef, e);
                 status.setError(true);
                 status.setMessage("An error occurred when fetching " + reindexOptions.datadef + ". " + e.toString());
