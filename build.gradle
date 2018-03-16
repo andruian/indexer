@@ -28,7 +28,10 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     maven {
-        url "https://repo.spring.io/libs-snapshot-local"
+        url "https://repo.spring.io/libs-local"
+    }
+    maven {
+        url  "https://dl.bintray.com/andruian/releases"
     }
 }
 
