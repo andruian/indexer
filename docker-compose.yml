@@ -1,0 +1,61 @@
+version: '2'
+services:
+  #
+  # Fuseki
+  #   No configuration needed
+  #
+  fuseki:
+    container_name: fuseki
+    image: stain/jena-fuseki
+    volumes:
+      - /data/fuseki:/fuseki # To persist datasets across restarts in /data/fuseki folder
+    ports:
+      - 3030:3030
+    environment:
+      - ADMIN_PASSWORD=some-secret
+
+  #
+  # MongoDB
+  #   No configuration needed
+  #
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - /data/mongo:/mongo # To persist datasets across restarts in /data/fuseki folder
+
+  #
+  # Solr
+  #   - First volume mount should point to https://github.com/andruian/indexer-solrconfig/tree/master/andruian_configset
+  #     Clone the repository and set up the path.
+  #   - Before starting up the image, change ownership of the folder contaning the configset to uid:gid 8983:8983.
+  #     E.g. $ chown -R 8983:8983 /path/to/andruian_configset
+  #
+  #
+  solr:
+    container_name: solr
+    image: solr
+    ports:
+      - 8983:8983
+    volumes:
+      - /path/to/andruian_configset/:/andruian_configset
+      - /data/solr:/opt/solr/server/solr/mycores
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - andruian
+      - /andruian_configset
+  #
+  # Indexer
+  #   - First volume mount should point to folder containing the indexer JAR and config files
+  #
+  indexer:
+    container_name: indexer
+    image: openjdk:8
+    ports:
+      - 8080:8080
+    volumes:
+      - /root/andruian/indexer:/indexer
+    command: /bin/bash -c "pushd /indexer && java -jar *.jar"

@@ -4,6 +4,8 @@ import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +36,7 @@ public class DataQueryRestController {
             else return places;
         } catch (QueryFormatException e) {
             e.printStackTrace();
-            return e.toString(); // TODO show error page?
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
         }
     }
     
