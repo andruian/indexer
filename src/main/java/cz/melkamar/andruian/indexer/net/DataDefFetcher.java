@@ -16,18 +16,18 @@ import java.util.List;
 @Component
 public class DataDefFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDefFetcher.class);
-    private final RdfFetcher rdfFetcher;
+    private final NetHelper netHelper;
 
     @Autowired
-    public DataDefFetcher(RdfFetcher rdfFetcher) {
-        this.rdfFetcher = rdfFetcher;
+    public DataDefFetcher(NetHelper netHelper) {
+        this.netHelper = netHelper;
     }
 
     public List<DataDef> getDataDefsFromUri(String uri) throws DataDefFormatException, IOException, RdfFormatException {
         LOGGER.info("Fetching DataDef from {}", uri);
         
         DataDefParser parser = new DataDefParser();
-        String payload = rdfFetcher.getDataDefFromUri(uri);
+        String payload = netHelper.httpGet(uri);
         return parser.parse(payload, RDFFormat.TURTLE);
     }
 }
