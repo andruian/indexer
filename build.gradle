@@ -50,7 +50,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-configuration-processor:2.0.0.RELEASE")
     compile("org.springframework.boot:spring-boot-devtools:2.0.0.RELEASE")
     // https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs
-    compile group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.6.0'
+    compile group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.6.0' // TODO remove dependency - SparqlConnector
     testCompile('org.springframework.boot:spring-boot-starter-test:2.0.0.RELEASE')
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
