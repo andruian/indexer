@@ -25,6 +25,21 @@
         <hr style="width: 100%"/>
     </div>
     <div class="row">
+        <div class="col-12">
+            <h4>Indexed datadefs</h4>
+            <ul th:if="${datadefs}!=null">
+                <!--<li th:each="datadef : ${config.datadefs}" th:inline="text" th:text="<a href=&quot;[[${datadef}]]&quot;>[[${datadef}]]</a>">Datadef here...</li>-->
+                <li th:each="datadef : ${datadefs}" th:utext="'<a href=&quot;'+${datadef}+'&quot;>'+${datadef}+'</a>'">Datadef here...</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10">
+            <hr style="width: 100%"/>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-6">
             <h4>Reindex data</h4>
             <form action="#" th:action="@{/admin/reindex}" th:object="${reindexOptions}" method="post">
@@ -56,6 +71,7 @@
             </form>
         </div>
     </div>
+
 </main>
 
 </body>
