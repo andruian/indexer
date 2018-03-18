@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 public class IndexerConfiguration {
     public static final String DATADEFS = "dataDefs";
     public static final String INDEX_CRON = "indexing.cron";
-    public static final String ONSTART_REINDEX = "onstart.reindex";
+    public static final String ONSTART_REINDEX = "indexing.onstart";
 
     public static final String DB_SOLR_URL = "db.solr.url";
     public static final String DB_SOLR_COLLECTION = "db.solr.collection";

@@ -12,6 +12,7 @@ import cz.melkamar.andruian.indexer.service.IndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +43,7 @@ public class AdminRestController {
     }
 
 
-    @RequestMapping("reindex")
+    @PostMapping("reindex")
     public String reindex(@RequestParam(value = "dataDefUri", required = false, defaultValue = "") String dataDefUri,
                           @RequestParam(value = "fullReindex", required = false, defaultValue = "0") boolean fullReindex) {
         LOGGER.info("Reindex uri: '{}'. Full reindex: {}", dataDefUri, fullReindex);
