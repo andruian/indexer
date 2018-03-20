@@ -12,19 +12,21 @@ public class Place {
     private final String classUri;
     private final String locationObjectUri;
     private final Property[] properties;
+    private final String label;
 
     public Place(double latPos,
                  double longPos,
                  String uri,
                  String classUri,
                  String locationObjectUri,
-                 Property[] properties) {
+                 Property[] properties, String label) {
         this.latPos = latPos;
         this.longPos = longPos;
         this.uri = uri;
         this.classUri = classUri;
         this.locationObjectUri = locationObjectUri;
         this.properties = properties;
+        this.label = label;
     }
 
 
@@ -35,7 +37,7 @@ public class Place {
     public double getLongPos() {
         return longPos;
     }
-    
+
     public String getUri() {
         return uri;
     }
@@ -61,6 +63,7 @@ public class Place {
                 ", classUri='" + classUri + '\'' +
                 ", locationObjectUri='" + locationObjectUri + '\'' +
                 ", properties=" + Arrays.toString(properties) +
+                ", label='" + label + '\'' +
                 '}';
     }
 }

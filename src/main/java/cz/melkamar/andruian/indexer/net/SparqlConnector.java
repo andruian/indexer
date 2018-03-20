@@ -45,6 +45,8 @@ public class SparqlConnector {
         String locationObjUri = querySolution.getResource("locationObj").toString();
         double latitude = querySolution.getLiteral("lat").getDouble();
         double longitude = querySolution.getLiteral("long").getDouble();
+        String prefLabel = querySolution.getLiteral("__prefLab__").getString();
+        String name = querySolution.getLiteral("__name__").getString();
         String dataClassType = querySolution.getResource("dataClassType").toString();
 
         Property[] properties = new Property[selectProperties.length];
@@ -59,7 +61,12 @@ public class SparqlConnector {
             }
         }
 
-        return new Place(latitude, longitude, dataObjUri, dataClassType, locationObjUri, properties);
+        // Assign label to the place - prefer skor:prefLabel, then s:name, and fallback to empty string.
+        String label = "";
+        if (prefLabel != null) label = prefLabel;
+        else if (name != null) label = name;
+
+        return new Place(latitude, longitude, dataObjUri, dataClassType, locationObjUri, properties, label);
     }
 
 }
