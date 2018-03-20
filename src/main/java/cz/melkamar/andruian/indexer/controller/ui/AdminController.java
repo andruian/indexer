@@ -5,6 +5,7 @@ import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.controller.Util;
+import cz.melkamar.andruian.indexer.model.DataDefFile;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
 import org.slf4j.Logger;
@@ -50,6 +51,9 @@ public class AdminController {
         if (!model.containsAttribute("reindexOptions"))
             model.addAttribute("reindexOptions", new ReindexOptions());
 
+        if (!model.containsAttribute("datadef"))
+            model.addAttribute("datadef", new DataDefFile());
+
         return "admin";
     }
 
@@ -78,6 +82,21 @@ public class AdminController {
 
         attributes.addFlashAttribute("status", status);
         attributes.addFlashAttribute("reindexOptions", reindexOptions);
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/addDatadef")
+    public String addDatadef(@ModelAttribute("datadef") DataDefFile dataDefFile,
+                             RedirectAttributes attributes) {
+        LOGGER.info("addDatadef: " + dataDefFile);
+
+        Status status = new Status();
+        status.setOk(true);
+        status.setMessage("Added a new data definition source '" + dataDefFile.getFileUrl() + "'");
+
+        // TODO call indexService method to add the datadef to mongo + show existing mongo datadefs + load configuration on start and add it to mongo if not already there
+
+        attributes.addFlashAttribute("status", status);
         return "redirect:/admin";
     }
 

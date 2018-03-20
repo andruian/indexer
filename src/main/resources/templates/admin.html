@@ -72,6 +72,28 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-10">
+            <hr style="width: 100%"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <h4>Manage data definitions</h4>
+            <!-- TODO table of existing datadefs with option to delete. -->
+
+            <form action="#" th:action="@{/admin/addDatadef}" th:object="${datadef}" method="post">
+                <div class="form-group">
+                    <label for="datadef-uri">Data definition source URL</label>
+                    <input type="text" class="form-control" id="datadef-uri" th:field="*{fileUrl}" />
+                </div>
+
+                <input type="submit" class="btn btn-primary" value="Add"/>
+            </form>
+        </div>
+    </div>
+
 </main>
 
 </body>

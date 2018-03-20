@@ -5,8 +5,10 @@ import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.ddfparser.model.SelectProperty;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
+import cz.melkamar.andruian.indexer.dao.MongoDataDefFileRepository;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.exception.SparqlQueryException;
+import cz.melkamar.andruian.indexer.model.DataDefFile;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.SolrPlace;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
@@ -30,16 +32,19 @@ public class IndexService {
     private final DataDefFetcher dataDefFetcher;
     private final SparqlConnector sparqlConnector;
     private final PlaceDAO placeDAO;
+    private final MongoDataDefFileRepository datadefFileRepository;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
                         DataDefFetcher dataDefFetcher,
                         SparqlConnector sparqlConnector,
-                        PlaceDAO placeDAO) {
+                        PlaceDAO placeDAO,
+                        MongoDataDefFileRepository datadefFileRepository) {
         this.indexerConfiguration = indexerConfiguration;
         this.dataDefFetcher = dataDefFetcher;
         this.sparqlConnector = sparqlConnector;
         this.placeDAO = placeDAO;
+        this.datadefFileRepository = datadefFileRepository;
     }
 
     /**
@@ -126,5 +131,9 @@ public class IndexService {
                 indexDataDef(dataDef, fullReindex);
             }
         }
+    }
+
+    public void addDatadef(String dataDefUri) {
+        datadefFileRepository.insert(new DataDefFile(dataDefUri));
     }
 }

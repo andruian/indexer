@@ -32,8 +32,16 @@ public class MapController {
     public void addAttributes(Model model){
         Util.addPrincipalAttribute(model);
     }
-    
+
     @GetMapping("/")
+    public String mainPage(Model model){
+        model.addAttribute("queryAttrs", new QueryAttrs(null, null, null, null));
+        model.addAttribute("errors", new Errors());
+        model.addAttribute("module", "map");
+        return "map";
+    }
+
+    @GetMapping("/show")
     public String showMap(@RequestParam(value = "type", required = false) String type,
                           @RequestParam(value = "lat", required = false) Double latitude,
                           @RequestParam(value = "long", required = false) Double longitude,

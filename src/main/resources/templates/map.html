@@ -32,7 +32,7 @@
                 An error occurred when executing the query.
             </div>
 
-            <form action="#" th:action="@{/}" th:object="${queryAttrs}" method="get">
+            <form action="#" th:action="@{/show}" th:object="${queryAttrs}" method="get">
                 <div class="form-group">
                     <label for="type">Type:</label>
                     <input id="type" type="text" class="form-control" placeholder="http://resourcetype.org/class" th:field="*{type}"/>
