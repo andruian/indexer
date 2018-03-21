@@ -38,30 +38,30 @@ TODO: provide release jar and application.properties
 ```json
 [
   {
-    "latPos": 49.74118888947373,
-    "longPos": 13.37026010049526,
-    "uri": "http://example.org/linkedobject-24540838",
-    "classUri": "http://example.org/MyObject",
-    "locationObjectUri": "http://ruian.linked.opendata.cz/resource/adresni-mista/24540838",
-    "properties": [
-      {
-        "name": "labelForIdProperty",
-        "value": 24540838
-      }
-    ]
+    "uri": "http://src.com/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F21909423",
+    "type": "http://example.org/SourceObjectA",
+    "locationObjectUri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/21909423",
+    "label": "Adamovská 1",
+    "properties": {
+      "StreetName": "Adamovská",
+      "PSC": "14000",
+      "StreetNum": "1"
+    },
+    "longPos": 14.45133,
+    "latPos": 50.058922
   },
   {
-    "latPos": 49.73968750921973,
-    "longPos": 13.367628108214324,
-    "uri": "http://example.org/linkedobject-24541753",
-    "classUri": "http://example.org/MyObject",
-    "locationObjectUri": "http://ruian.linked.opendata.cz/resource/adresni-mista/24541753",
-    "properties": [
-      {
-        "name": "labelForIdProperty",
-        "value": 24541753
-      }
-    ]
+    "uri": "http://src.com/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F21908761",
+    "type": "http://example.org/SourceObjectA",
+    "locationObjectUri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/21908761",
+    "label": "Adamovská 5",
+    "properties": {
+      "StreetName": "Adamovská",
+      "PSC": "14000",
+      "StreetNum": "5"
+    },
+    "longPos": 14.451405,
+    "latPos": 50.05922
   }
 ]
 ```

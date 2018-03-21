@@ -1,5 +1,6 @@
 package cz.melkamar.andruian.indexer.model.place;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
@@ -18,6 +19,7 @@ public class Place {
     @Field
     private String type;
 
+    @JsonIgnore
     @Field
     private Point location;
 
