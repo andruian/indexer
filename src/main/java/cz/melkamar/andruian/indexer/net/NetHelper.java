@@ -20,7 +20,8 @@ public class NetHelper {
         LOGGER.info("HTTP GET {}", uri);
 
         String payload = restTemplate.getForObject(uri, String.class);
-        LOGGER.trace("Downloaded payload");
+        LOGGER.trace("Downloaded payload:");
+        LOGGER.trace(payload);
         return payload;
     }
 }

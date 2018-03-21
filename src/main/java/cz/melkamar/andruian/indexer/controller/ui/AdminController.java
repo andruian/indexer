@@ -3,8 +3,8 @@ package cz.melkamar.andruian.indexer.controller.ui;
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
-import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.controller.Util;
+import cz.melkamar.andruian.indexer.dao.MongoDataDefFileRepository;
 import cz.melkamar.andruian.indexer.model.DataDefFile;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
@@ -27,94 +27,119 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
-    private final IndexerConfiguration indexerConfiguration;
     private final IndexService indexService;
     private final DataDefFetcher dataDefFetcher;
+    private final MongoDataDefFileRepository dataDefFileRepository;
 
     @Autowired
-    public AdminController(IndexerConfiguration indexerConfiguration,
-                           IndexService indexService, DataDefFetcher dataDefFetcher) {
-        this.indexerConfiguration = indexerConfiguration;
+    public AdminController(IndexService indexService,
+                           DataDefFetcher dataDefFetcher,
+                           MongoDataDefFileRepository dataDefFileRepository) {
         this.indexService = indexService;
         this.dataDefFetcher = dataDefFetcher;
+        this.dataDefFileRepository = dataDefFileRepository;
     }
 
     @ModelAttribute
     public void addAttributes(Model model) {
         model.addAttribute("module", "admin");
-        model.addAttribute("datadefs", indexerConfiguration.getDataDefUris());
+//        model.addAttribute("datadefs", Arrays.stream(indexerConfiguration.getDataDefUris()).map(DataDefFile::new).collect(Collectors.toList()));
+        model.addAttribute("datadefs", dataDefFileRepository.findAll());
         Util.addPrincipalAttribute(model);
     }
 
     @GetMapping
     public String admin(Model model) {
-        if (!model.containsAttribute("reindexOptions"))
-            model.addAttribute("reindexOptions", new ReindexOptions());
+        if (!model.containsAttribute("datadefParam"))
+            model.addAttribute("datadefParam", new DataDefFileParam());
 
-        if (!model.containsAttribute("datadef"))
-            model.addAttribute("datadef", new DataDefFile());
 
         return "admin";
     }
 
     @PostMapping("/reindex")
-    public String reindex(@ModelAttribute("reindexOptions") ReindexOptions reindexOptions,
+    public String reindex(@ModelAttribute("reindexOptions") DataDefFileParam dataDefFileParam,
                           RedirectAttributes attributes) {
+        LOGGER.info("reindex "+dataDefFileParam);
+
         Status status = new Status();
-        if (reindexOptions.datadef.toLowerCase().equals("all")) {
+        if (dataDefFileParam.reindexAll) {
             status.setOk(true);
-            status.setMessage(StringUtils.capitalize(reindexOptions.reindexType) + " reindexing started for all data sources.");
-            indexService.reindexAll(reindexOptions.reindexType.equals("full"));
+            status.setMessage(StringUtils.capitalize(dataDefFileParam.reindexType) + " reindexing started for all data sources.");
+            indexService.reindexAll(dataDefFileParam.reindexType.equals("full"));
         } else {
             try {
-                List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(reindexOptions.datadef);
+                List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFileParam.getFileUrl());
                 status.setOk(true);
-                status.setMessage(StringUtils.capitalize(reindexOptions.reindexType) + " reindexing started for " + reindexOptions.datadef);
+                status.setMessage(StringUtils.capitalize(dataDefFileParam.reindexType) + " reindexing started for " + dataDefFileParam.fileUrl);
                 for (DataDef dataDef : dataDefs) {
-                    indexService.indexDataDef(dataDef, reindexOptions.reindexType.equals("full"));
+                    indexService.indexDataDef(dataDef, dataDefFileParam.reindexType.equals("full"));
                 }
             } catch (RdfFormatException | DataDefFormatException | IOException e) {
-                LOGGER.error("An exception occurred when pulling datadef " + reindexOptions.datadef, e);
+                LOGGER.error("An exception occurred when pulling datadef " + dataDefFileParam.fileUrl, e);
                 status.setError(true);
-                status.setMessage("An error occurred when fetching " + reindexOptions.datadef + ". " + e.toString());
+                status.setMessage("An error occurred when fetching " + dataDefFileParam.fileUrl + ". " + e.toString());
             }
         }
 
         attributes.addFlashAttribute("status", status);
-        attributes.addFlashAttribute("reindexOptions", reindexOptions);
+        attributes.addFlashAttribute("reindexOptions", dataDefFileParam);
         return "redirect:/admin";
     }
 
     @PostMapping("/addDatadef")
-    public String addDatadef(@ModelAttribute("datadef") DataDefFile dataDefFile,
+    public String addDatadef(@ModelAttribute("datadefParam") DataDefFileParam dataDefFileParam,
                              RedirectAttributes attributes) {
-        LOGGER.info("addDatadef: " + dataDefFile);
+        LOGGER.info("addDatadef: " + dataDefFileParam);
 
         Status status = new Status();
         status.setOk(true);
-        status.setMessage("Added a new data definition source '" + dataDefFile.getFileUrl() + "'");
+        status.setMessage("Added a new data definition source '" + dataDefFileParam.getFileUrl() + "'");
 
         // TODO call indexService method to add the datadef to mongo + show existing mongo datadefs + load configuration on start and add it to mongo if not already there
+        dataDefFileRepository.insert(new DataDefFile(dataDefFileParam.getFileUrl()));
 
         attributes.addFlashAttribute("status", status);
         return "redirect:/admin";
     }
 
-    class ReindexOptions {
-        String datadef = "All";
-        String reindexType = "incremental";
+    @PostMapping("/deleteddf")
+    public String removeDatadef(@ModelAttribute("datadefParam") DataDefFileParam dataDefFileParam,
+                                RedirectAttributes attributes) {
+        LOGGER.info("deleteDdf: " + dataDefFileParam);
+        dataDefFileRepository.delete(new DataDefFile(dataDefFileParam.fileUrl));
 
-        public ReindexOptions() {
+        Status status = new Status();
+        status.setOk(true);
+        status.setMessage("Removed data definition source '" + dataDefFileParam.getFileUrl() + "'");
+
+        attributes.addFlashAttribute("status", status);
+        return "redirect:/admin";
+    }
+
+    class DataDefFileParam {
+        private String fileUrl = "All";
+        private String reindexType = "incremental";
+        private boolean reindexAll = false;
+
+        public DataDefFileParam() {
         }
 
-        public String getDatadef() {
-            return datadef;
+        public boolean isReindexAll() {
+            return reindexAll;
         }
 
-        public void setDatadef(String datadef) {
-            this.datadef = datadef;
+        public void setReindexAll(boolean reindexAll) {
+            this.reindexAll = reindexAll;
         }
 
+        public String getFileUrl() {
+            return fileUrl;
+        }
+
+        public void setFileUrl(String fileUrl) {
+            this.fileUrl = fileUrl;
+        }
 
         public String getReindexType() {
             return reindexType;
@@ -122,6 +147,15 @@ public class AdminController {
 
         public void setReindexType(String reindexType) {
             this.reindexType = reindexType;
+        }
+
+        @Override
+        public String toString() {
+            return "DataDefFileParam{" +
+                    "fileUrl='" + fileUrl + '\'' +
+                    ", reindexType='" + reindexType + '\'' +
+                    ", reindexAll=" + reindexAll +
+                    '}';
         }
     }
 

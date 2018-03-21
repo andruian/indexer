@@ -2,7 +2,6 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX eu: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
 PREFIX ru: <http://purl.org/imbi/ru-meta.owl#>
 prefix ex: <http://example.org/>
-prefix ruian: <http://ruian.linked.opendata.cz/ontology/>
 prefix s: <http://schema.org/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
@@ -55,13 +54,5 @@ WHERE {
                  {longLocationPathForLocationClass} ?long;
     .
 
-    #
-    # RUIAN-specific
-    #   For some reason RUIAN has two values for object's coordinates.
-    #   Make sure we get the one we expect by filtering.
-    FILTER(
-      datatype(?lat) = xsd:decimal &&
-      datatype(?long) = xsd:decimal
-    )
   }
 }

@@ -5,6 +5,7 @@ import cz.melkamar.andruian.indexer.exception.SparqlQueryException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.model.place.Property;
 import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,15 @@ public class SparqlConnector {
         String locationObjUri = querySolution.getResource("locationObj").toString();
         double latitude = querySolution.getLiteral("lat").getDouble();
         double longitude = querySolution.getLiteral("long").getDouble();
-        String prefLabel = querySolution.getLiteral("__prefLab__").getString();
-        String name = querySolution.getLiteral("__name__").getString();
         String dataClassType = querySolution.getResource("dataClassType").toString();
+
+        Literal prefLabelLit = querySolution.getLiteral("__prefLab__");
+        Literal nameLit = querySolution.getLiteral("__name__");
+
+        String prefLabel = null;
+        if (prefLabelLit != null) prefLabel = querySolution.getLiteral("__prefLab__").getString();
+        String name = null;
+        if (nameLit != null) name = querySolution.getLiteral("__name__").getString();
 
         Property[] properties = new Property[selectProperties.length];
         for (int i = 0; i < selectProperties.length; i++) {

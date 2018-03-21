@@ -10,7 +10,6 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,24 +66,32 @@ public class PlaceDAO {
     }
 
     public List<Place> getPlacesAroundPoint(double latCoord, double longCoord, double radius) {
+        LOGGER.debug("getPlacesAroundPoint {} {} {}", latCoord, longCoord, radius);
         List<SolrPlace> solrPlaces = solrPlaceRepository.findByLocationWithin(new Point(latCoord, longCoord),
                                                                               new Distance(radius));
-        List<Place> result = new ArrayList<>(solrPlaces.size());
-        for (SolrPlace solrPlace : solrPlaces) {
-            mongoPlaceRepository.findByUri(solrPlace.getUri()).ifPresent(result::add);
-        }
-
+        LOGGER.debug("getPlacesAroundPoint - found {} SolrPlaces", solrPlaces.size());
+        List<Place> result = mongoPlaceRepository.findAllByUriIn(solrPlaces.stream()
+                                                                         .map(SolrPlace::getUri)
+                                                                         .collect(Collectors.toList()));
+        LOGGER.debug("getPlacesAroundPoint - found {} Places from Mongo", result.size());
         return result;
     }
 
     public List<Place> getPlacesAroundPointOfClass(String classUri, double latCoord, double longCoord, double radius) {
+        LOGGER.debug("getPlacesAroundPointOfClass {} {} {} {}", classUri, latCoord, longCoord, radius);
         List<SolrPlace> solrPlaces = solrPlaceRepository.findByTypeAndLocationWithin(classUri,
                                                                                      new Point(latCoord, longCoord),
                                                                                      new Distance(radius));
-        List<Place> result = new ArrayList<>(solrPlaces.size());
+        LOGGER.debug("getPlacesAroundPointOfClass - found {} SolrPlaces", solrPlaces.size());
+        List<Place> result = mongoPlaceRepository.findAllByClassUriAndUriIn(classUri,
+                                                                            solrPlaces.stream()
+                                                                                    .map(SolrPlace::getUri)
+                                                                                    .collect(Collectors.toList()));
+
         for (SolrPlace solrPlace : solrPlaces) {
             mongoPlaceRepository.findByUri(solrPlace.getUri()).ifPresent(result::add);
         }
+        LOGGER.debug("getPlacesAroundPointOfClass - found {} Places from Mongo", result.size());
 
         return result;
     }
