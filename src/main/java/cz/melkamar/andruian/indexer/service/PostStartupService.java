@@ -1,7 +1,6 @@
 package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
-import cz.melkamar.andruian.indexer.dao.MongoPlaceRepository;
 import cz.melkamar.andruian.indexer.dao.SolrPlaceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,17 +14,14 @@ public class PostStartupService {
     private final IndexService indexService;
     private final IndexerConfiguration indexerConfiguration;
     private final SolrPlaceRepository solrRepository;
-    private final MongoPlaceRepository mongoRepository;
 
     @Autowired
     public PostStartupService(IndexService indexService,
                               IndexerConfiguration indexerConfiguration,
-                              SolrPlaceRepository solrRepository,
-                              MongoPlaceRepository mongoRepository) {
+                              SolrPlaceRepository solrRepository) {
         this.indexService = indexService;
         this.indexerConfiguration = indexerConfiguration;
         this.solrRepository = solrRepository;
-        this.mongoRepository = mongoRepository;
     }
 
 

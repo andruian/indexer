@@ -10,7 +10,6 @@ import cz.melkamar.andruian.indexer.dao.PlaceDAO;
 import cz.melkamar.andruian.indexer.exception.SparqlQueryException;
 import cz.melkamar.andruian.indexer.model.DataDefFile;
 import cz.melkamar.andruian.indexer.model.place.Place;
-import cz.melkamar.andruian.indexer.model.place.SolrPlace;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.net.SparqlConnector;
 import cz.melkamar.andruian.indexer.rdf.IndexSparqlQueryBuilder;
@@ -54,10 +53,6 @@ public class IndexService {
      * The query will select all objects of a type defined in the {@link DataDef} and find their linked
      * location objects and position coordinates (via a federated query, those objects may be accessible through a
      * different controller - in the prototype version this will be the RÚIAN SPARQL controller).
-     * <p>
-     * Objects obtained by the query will be stored in Solr and MongoDB. Solr will only contain a stub of the
-     * full representation - {@link SolrPlace}). This stub will contain location coordinates and a URI of the
-     * resource. The whole representation - {@link Place} will be stored in MongoDB with the resource URI as the key.
      *
      * @param dataDef     A definition of the data.
      * @param fullReindex If true, reindex everything. If false, skip querying of objects already indexed (incremental

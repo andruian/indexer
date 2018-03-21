@@ -1,73 +1,119 @@
 package cz.melkamar.andruian.indexer.model.place;
 
+import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
+import org.springframework.data.solr.core.mapping.Dynamic;
+import org.springframework.data.solr.core.mapping.SolrDocument;
 
-import java.util.Arrays;
+import java.util.Map;
 
+//@SolrDocument(solrCoreName = "${db.solr.collection}")
+@SolrDocument(solrCoreName = "andruian") // TODO why is the property reference not resolving?
 public class Place {
-    private final double latPos;
-    private final double longPos;
     @Id
-    private final String uri;
-    private final String classUri;
-    private final String locationObjectUri;
-    private final Property[] properties;
-    private final String label;
+    @Field
+    private String uri;
 
-    public Place(double latPos,
-                 double longPos,
-                 String uri,
-                 String classUri,
+    @Field
+    private String type;
+
+    @Field
+    private Point location;
+
+    @Field
+    private String locationObjectUri;
+    @Field
+    private String label;
+
+    @Dynamic
+    @Field(value = "*_prop_dynstr")
+    private Map<String, String> properties;
+
+    public Place(String uri,
+                 String type,
+                 Point location,
                  String locationObjectUri,
-                 Property[] properties, String label) {
-        this.latPos = latPos;
-        this.longPos = longPos;
+                 String label,
+                 Map<String, String> properties) {
         this.uri = uri;
-        this.classUri = classUri;
+        this.type = type;
+        this.location = location;
         this.locationObjectUri = locationObjectUri;
-        this.properties = properties;
         this.label = label;
+        this.properties = properties;
     }
 
-
-    public double getLatPos() {
-        return latPos;
+    public double getLatPos(){
+        return location.getX();
     }
 
-    public double getLongPos() {
-        return longPos;
+    public double getLongPos(){
+        return location.getY();
     }
 
     public String getUri() {
         return uri;
     }
 
-    public String getClassUri() {
-        return classUri;
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Point getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point location) {
+        this.location = location;
     }
 
     public String getLocationObjectUri() {
         return locationObjectUri;
     }
 
-    public Property[] getProperties() {
-        return properties;
+    public void setLocationObjectUri(String locationObjectUri) {
+        this.locationObjectUri = locationObjectUri;
     }
 
     public String getLabel() {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
     @Override
     public String toString() {
+        StringBuilder proptxt = new StringBuilder();
+        for (Map.Entry<String, String> stringStringEntry : properties.entrySet()) {
+            proptxt.append(stringStringEntry.getKey()).append(": ").append(stringStringEntry.getValue()).append("\n");
+        }
+
         return "Place{" +
-                "latPos=" + latPos +
-                ", longPos=" + longPos +
-                ", uri='" + uri + '\'' +
-                ", classUri='" + classUri + '\'' +
+                "uri='" + uri + '\'' +
+                ", type='" + type + '\'' +
+                ", location=" + location +
                 ", locationObjectUri='" + locationObjectUri + '\'' +
-                ", properties=" + Arrays.toString(properties) +
                 ", label='" + label + '\'' +
+                ", properties=" + proptxt.toString() +
                 '}';
     }
 }
