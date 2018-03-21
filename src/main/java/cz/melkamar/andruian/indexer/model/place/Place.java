@@ -54,6 +54,10 @@ public class Place {
         return properties;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
     @Override
     public String toString() {
         return "Place{" +
