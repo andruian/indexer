@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -43,8 +44,23 @@ public class AdminController {
     @ModelAttribute
     public void addAttributes(Model model) {
         model.addAttribute("module", "admin");
-//        model.addAttribute("datadefs", Arrays.stream(indexerConfiguration.getDataDefUris()).map(DataDefFile::new).collect(Collectors.toList()));
-        model.addAttribute("datadefs", dataDefFileRepository.findAll());
+        List<DataDefFile> dataDefFiles = dataDefFileRepository.findAll();
+        List<DataDefFileTableRow> dataDefFileTableRows = new ArrayList<>(dataDefFiles.size());
+
+        for (DataDefFile dataDefFile : dataDefFiles) {
+            try {
+                List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFile.getFileUrl());
+                int count = 0;
+                for (DataDef dataDef : dataDefs) {
+                    count += indexService.getIndexedPlacesCount(dataDef);
+                }
+                dataDefFileTableRows.add(new DataDefFileTableRow(dataDefFile, count));
+            } catch (RdfFormatException | DataDefFormatException | IOException e) {
+                LOGGER.error("An exception occurred when pulling datadef " + dataDefFile.getFileUrl(), e);
+            }
+        }
+
+        model.addAttribute("datadefs", dataDefFileTableRows);
         Util.addPrincipalAttribute(model);
     }
 
@@ -60,7 +76,7 @@ public class AdminController {
     @PostMapping("/reindex")
     public String reindex(@ModelAttribute("reindexOptions") DataDefFileParam dataDefFileParam,
                           RedirectAttributes attributes) {
-        LOGGER.info("reindex "+dataDefFileParam);
+        LOGGER.info("reindex " + dataDefFileParam);
 
         Status status = new Status();
         if (dataDefFileParam.reindexAll) {
@@ -112,6 +128,29 @@ public class AdminController {
         Status status = new Status();
         status.setOk(true);
         status.setMessage("Removed data definition source '" + dataDefFileParam.getFileUrl() + "'");
+
+        attributes.addFlashAttribute("status", status);
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/dropdata")
+    public String dropData(@ModelAttribute("datadefParam") DataDefFileParam dataDefFileParam,
+                           RedirectAttributes attributes) {
+        LOGGER.info("dropdata: " + dataDefFileParam);
+        Status status = new Status();
+
+        try {
+            List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFileParam.getFileUrl());
+            for (DataDef dataDef : dataDefs) {
+                indexService.dropData(dataDef);
+            }
+            status.setOk(true);
+            status.setMessage("Dropped data for definitions in file '" + dataDefFileParam.getFileUrl() + "'");
+        } catch (RdfFormatException | DataDefFormatException | IOException e) {
+            LOGGER.error("An exception occurred when pulling datadef " + dataDefFileParam.fileUrl, e);
+            status.setError(true);
+            status.setMessage("An error occurred when fetching " + dataDefFileParam.fileUrl + ". " + e.toString());
+        }
 
         attributes.addFlashAttribute("status", status);
         return "redirect:/admin";
@@ -191,4 +230,21 @@ public class AdminController {
         }
     }
 
+    class DataDefFileTableRow {
+        private final DataDefFile dataDefFile;
+        private final int indexedCount;
+
+        public DataDefFileTableRow(DataDefFile dataDefFile, int indexedCount) {
+            this.dataDefFile = dataDefFile;
+            this.indexedCount = indexedCount;
+        }
+
+        public DataDefFile getDataDefFile() {
+            return dataDefFile;
+        }
+
+        public int getIndexedCount() {
+            return indexedCount;
+        }
+    }
 }

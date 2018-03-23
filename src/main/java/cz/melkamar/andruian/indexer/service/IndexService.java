@@ -88,7 +88,8 @@ public class IndexService {
         LOGGER.debug("Query string: \n{}", query);
         List<Place> places = null;
         try {
-            places = sparqlConnector.executeIndexQuery(query,
+            places = sparqlConnector.executeIndexQuery(dataDef.getUri(),
+                                                       query,
                                                        dataDef.getSourceClassDef().getSparqlEndpoint(),
                                                        dataDef.getSourceClassDef().getSelectPropertiesNames());
         } catch (SparqlQueryException e) {
@@ -126,6 +127,14 @@ public class IndexService {
                 indexDataDef(dataDef, fullReindex);
             }
         }
+    }
+
+    public void dropData(DataDef dataDef) {
+        placeDAO.deletePlacesOfDataDef(dataDef);
+    }
+
+    public int getIndexedPlacesCount(DataDef dataDef) {
+        return placeDAO.getDatadefPlacesCount(dataDef);
     }
 
     public void addDatadef(String dataDefUri) {

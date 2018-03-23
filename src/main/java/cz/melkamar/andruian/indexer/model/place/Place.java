@@ -28,16 +28,21 @@ public class Place {
     @Field
     private String label;
 
+    @JsonIgnore
+    @Field(value = "srcddf_dynstr")
+    private String sourceDatadef;
+
     @Dynamic
     @Field(value = "*_prop_dynstr")
     private Map<String, String> properties;
 
-    public Place(String uri,
+    public Place(String sourceDatadef, String uri,
                  String type,
                  Point location,
                  String locationObjectUri,
                  String label,
                  Map<String, String> properties) {
+        this.sourceDatadef = sourceDatadef;
         this.uri = uri;
         this.type = type;
         this.location = location;

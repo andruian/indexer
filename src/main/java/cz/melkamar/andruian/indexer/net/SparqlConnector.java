@@ -20,7 +20,7 @@ import java.util.Map;
 public class SparqlConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparqlConnector.class);
 
-    public List<Place> executeIndexQuery(String queryStr, String sparqlEndpoint, String[] selectProperties)
+    public List<Place> executeIndexQuery(String datadefIri, String queryStr, String sparqlEndpoint, String[] selectProperties)
             throws SparqlQueryException {
         Query query = QueryFactory.create(queryStr);
         QueryExecution qexec = QueryExecutionFactory
@@ -32,7 +32,7 @@ public class SparqlConnector {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
-                resultList.add(placeFromQueryResult(soln, selectProperties));
+                resultList.add(placeFromQueryResult(datadefIri, soln, selectProperties));
             }
         } catch (Exception e) {
             throw new SparqlQueryException(e);
@@ -43,7 +43,7 @@ public class SparqlConnector {
         return resultList;
     }
 
-    Place placeFromQueryResult(QuerySolution querySolution, String[] selectProperties) {
+    Place placeFromQueryResult(String datadefIri, QuerySolution querySolution, String[] selectProperties) {
         String dataObjUri = querySolution.getResource("dataObj").toString();
         String locationObjUri = querySolution.getResource("locationObj").toString();
         double latitude = querySolution.getLiteral("lat").getDouble();
@@ -74,7 +74,8 @@ public class SparqlConnector {
         if (prefLabel != null) label = prefLabel;
         else if (name != null) label = name;
 
-        return new Place(dataObjUri, dataClassType, new Point(latitude, longitude), locationObjUri, label, properties);
+        return new Place(datadefIri,
+                         dataObjUri, dataClassType, new Point(latitude, longitude), locationObjUri, label, properties);
     }
 
 }
