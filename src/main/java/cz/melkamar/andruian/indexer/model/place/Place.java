@@ -14,7 +14,7 @@ import java.util.Map;
 public class Place {
     @Id
     @Field
-    private String uri;
+    private String iri;
 
     @Field
     private String type;
@@ -24,7 +24,7 @@ public class Place {
     private Point location;
 
     @Field
-    private String locationObjectUri;
+    private String locationObjectIri;
     @Field
     private String label;
 
@@ -36,17 +36,17 @@ public class Place {
     @Field(value = "*_prop_dynstr")
     private Map<String, String> properties;
 
-    public Place(String sourceDatadef, String uri,
+    public Place(String sourceDatadef, String iri,
                  String type,
                  Point location,
-                 String locationObjectUri,
+                 String locationObjectIri,
                  String label,
                  Map<String, String> properties) {
         this.sourceDatadef = sourceDatadef;
-        this.uri = uri;
+        this.iri = iri;
         this.type = type;
         this.location = location;
-        this.locationObjectUri = locationObjectUri;
+        this.locationObjectIri = locationObjectIri;
         this.label = label;
         this.properties = properties;
     }
@@ -59,12 +59,12 @@ public class Place {
         return location.getY();
     }
 
-    public String getUri() {
-        return uri;
+    public String getIri() {
+        return iri;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setIri(String iri) {
+        this.iri = iri;
     }
 
     public String getType() {
@@ -83,12 +83,12 @@ public class Place {
         this.location = location;
     }
 
-    public String getLocationObjectUri() {
-        return locationObjectUri;
+    public String getLocationObjectIri() {
+        return locationObjectIri;
     }
 
-    public void setLocationObjectUri(String locationObjectUri) {
-        this.locationObjectUri = locationObjectUri;
+    public void setLocationObjectIri(String locationObjectIri) {
+        this.locationObjectIri = locationObjectIri;
     }
 
     public String getLabel() {
@@ -115,10 +115,10 @@ public class Place {
         }
 
         return "Place{" +
-                "uri='" + uri + '\'' +
+                "iri='" + iri + '\'' +
                 ", type='" + type + '\'' +
                 ", location=" + location +
-                ", locationObjectUri='" + locationObjectUri + '\'' +
+                ", locationObjectUri='" + locationObjectIri + '\'' +
                 ", label='" + label + '\'' +
                 ", properties=" + proptxt.toString() +
                 '}';

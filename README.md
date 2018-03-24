@@ -31,16 +31,16 @@ TODO: provide release jar and application.properties
         - 1.011
     - `type`
         - Optional. Limit searched objects to those of this type
-        - http-encoded-uri (IRI of an RDF class)
+        - http-encoded-iri (IRI of an RDF class)
         
 - Example: `http://localhost:8080/api/query?lat=49.74468693637641&long=13.37622390978595&r=1.011`
 - Response: 
 ```json
 [
   {
-    "uri": "http://src.com/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F21909423",
+    "iri": "http://src.com/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F21909423",
     "type": "http://example.org/SourceObjectA",
-    "locationObjectUri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/21909423",
+    "locationObjectIri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/21909423",
     "label": "Adamovská 1",
     "properties": {
       "StreetName": "Adamovská",
@@ -51,9 +51,9 @@ TODO: provide release jar and application.properties
     "latPos": 50.058922
   },
   {
-    "uri": "http://src.com/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F21908761",
+    "iri": "http://src.com/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F21908761",
     "type": "http://example.org/SourceObjectA",
-    "locationObjectUri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/21908761",
+    "locationObjectIri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/21908761",
     "label": "Adamovská 5",
     "properties": {
       "StreetName": "Adamovská",

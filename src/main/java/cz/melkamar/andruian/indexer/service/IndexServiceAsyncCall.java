@@ -56,7 +56,7 @@ public class IndexServiceAsyncCall {
 
         if (!fullReindex) {
             for (Place place : placeDAO.getPlacesOfClass(dataDef.getSourceClassDef().getClassUri())) {
-                queryBuilder.excludeUri(place.getUri());
+                queryBuilder.excludeUri(place.getIri());
             }
         }
 
