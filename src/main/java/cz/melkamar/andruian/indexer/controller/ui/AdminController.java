@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.util.StringUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/admin")
@@ -48,19 +48,23 @@ public class AdminController {
         List<DataDefFileTableRow> dataDefFileTableRows = new ArrayList<>(dataDefFiles.size());
 
         for (DataDefFile dataDefFile : dataDefFiles) {
-            try {
-                List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFile.getFileUrl());
-                int count = 0;
-                for (DataDef dataDef : dataDefs) {
-                    count += indexService.getIndexedPlacesCount(dataDef);
-                }
-                dataDefFileTableRows.add(new DataDefFileTableRow(dataDefFile, count));
-            } catch (RdfFormatException | DataDefFormatException | IOException e) {
-                LOGGER.error("An exception occurred when pulling datadef " + dataDefFile.getFileUrl(), e);
+            int count = 0;
+            for (String dataDefIri : dataDefFile.getDataDefIris()) {
+                count += indexService.getIndexedPlacesCount(dataDefIri);
             }
+            dataDefFileTableRows.add(new DataDefFileTableRow(dataDefFile, count));
+        }
+
+        IndexingJobsStatus indexingJobsStatus = new IndexingJobsStatus();
+        indexingJobsStatus.addAllRunningJobs(indexService.getRunningJobs());
+        indexingJobsStatus.addAllFinishedJobs(indexService.getFinishedJobs());
+        for (Map.Entry<DataDef, Exception> entry : indexService.getErroredJobs().entrySet()) {
+            indexingJobsStatus.addErrorJob(entry.getKey(), entry.getValue().getMessage());
         }
 
         model.addAttribute("datadefs", dataDefFileTableRows);
+        model.addAttribute("indexingJobs", indexingJobsStatus);
+
         Util.addPrincipalAttribute(model);
     }
 
@@ -112,8 +116,14 @@ public class AdminController {
         status.setOk(true);
         status.setMessage("Added a new data definition source '" + dataDefFileParam.getFileUrl() + "'");
 
-        // TODO call indexService method to add the datadef to mongo + show existing mongo datadefs + load configuration on start and add it to mongo if not already there
-        dataDefFileRepository.insert(new DataDefFile(dataDefFileParam.getFileUrl()));
+        try {
+            indexService.addDatadefFile(dataDefFileParam.getFileUrl());
+        } catch (Exception e) {
+            LOGGER.error("An exception occurred when pulling datadef " + dataDefFileParam.fileUrl, e);
+            status.setError(true);
+            status.setMessage("An error occurred when fetching " + dataDefFileParam.fileUrl + ". " + e.toString());
+        }
+
 
         attributes.addFlashAttribute("status", status);
         return "redirect:/admin";
@@ -123,7 +133,7 @@ public class AdminController {
     public String removeDatadef(@ModelAttribute("datadefParam") DataDefFileParam dataDefFileParam,
                                 RedirectAttributes attributes) {
         LOGGER.info("deleteDdf: " + dataDefFileParam);
-        dataDefFileRepository.delete(new DataDefFile(dataDefFileParam.fileUrl));
+        dataDefFileRepository.delete(new DataDefFile(dataDefFileParam.fileUrl, new ArrayList<>()));
 
         Status status = new Status();
         status.setOk(true);
@@ -140,13 +150,16 @@ public class AdminController {
         Status status = new Status();
 
         try {
-            List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFileParam.getFileUrl());
-            for (DataDef dataDef : dataDefs) {
-                indexService.dropData(dataDef);
+            Optional<DataDefFile> dataDefFile = dataDefFileRepository.findById(dataDefFileParam.getFileUrl());
+
+//            List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFileParam.getFileUrl());
+            for (String dataDefIri : dataDefFile.orElseThrow(() -> new FileNotFoundException("not found: " + dataDefFileParam
+                    .getFileUrl())).getDataDefIris()) {
+                indexService.dropData(dataDefIri);
             }
             status.setOk(true);
             status.setMessage("Dropped data for definitions in file '" + dataDefFileParam.getFileUrl() + "'");
-        } catch (RdfFormatException | DataDefFormatException | IOException e) {
+        } catch (Exception e) {
             LOGGER.error("An exception occurred when pulling datadef " + dataDefFileParam.fileUrl, e);
             status.setError(true);
             status.setMessage("An error occurred when fetching " + dataDefFileParam.fileUrl + ". " + e.toString());
@@ -195,6 +208,46 @@ public class AdminController {
                     ", reindexType='" + reindexType + '\'' +
                     ", reindexAll=" + reindexAll +
                     '}';
+        }
+    }
+
+    class IndexingJobsStatus {
+        private List<DataDef> runningJobs;
+        private List<IndexService.FinishedJobReport> finishedJobs;
+        private List<String> errorJobs;
+
+        public IndexingJobsStatus() {
+            runningJobs = new ArrayList<>();
+            errorJobs = new ArrayList<>();
+            finishedJobs = new ArrayList<>();
+        }
+
+        public List<DataDef> getRunningJobs() {
+            return runningJobs;
+        }
+
+        public List<String> getErrorJobs() {
+            return errorJobs;
+        }
+
+        public void addRunningJob(DataDef dataDef) {
+            this.runningJobs.add(dataDef);
+        }
+
+        public void addAllRunningJobs(Collection<DataDef> dataDefs) {
+            runningJobs.addAll(dataDefs);
+        }
+
+        public void addErrorJob(DataDef dataDef, String message) {
+            this.errorJobs.add(dataDef.getUri() + " - " + message);
+        }
+
+        public List<IndexService.FinishedJobReport> getFinishedJobs() {
+            return finishedJobs;
+        }
+
+        public void addAllFinishedJobs(Collection<IndexService.FinishedJobReport> finishedJobReports){
+            this.finishedJobs.addAll(finishedJobReports);
         }
     }
 

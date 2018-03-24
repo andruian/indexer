@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class IndexerConfiguration {
-    public static final String DATADEFS = "dataDefs";
+//    public static final String DATADEFS = "dataDefs";
     public static final String INDEX_CRON = "indexing.cron";
     public static final String ONSTART_REINDEX = "indexing.onstart";
 
@@ -15,8 +15,8 @@ public class IndexerConfiguration {
     public static final String ADMIN_USERNAME = "admin.username";
     public static final String ADMIN_PASSWORD = "admin.password";
 
-    @Value("${" + DATADEFS + "}")
-    private String[] dataDefs;
+//    @Value("${" + DATADEFS + "}")
+//    private String[] dataDefs;
 
     @Value("${" + INDEX_CRON + ":#{null}}")
     private String indexingCron;
@@ -34,9 +34,9 @@ public class IndexerConfiguration {
     @Value("${" + ADMIN_PASSWORD + "}")
     private String adminPassword;
 
-    public String[] getDataDefUris() {
-        return dataDefs;
-    }
+//    public String[] getDataDefUris() {
+//        return dataDefs;
+//    }
 
     public String getIndexingCron() {
         return indexingCron;

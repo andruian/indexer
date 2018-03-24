@@ -3,8 +3,7 @@ package cz.melkamar.andruian.indexer.controller.rest;
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
-import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
-import cz.melkamar.andruian.indexer.dao.PlaceDAO;
+import cz.melkamar.andruian.indexer.dao.MongoDataDefFileRepository;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 
 @RestController
 @RequestMapping(value = "/api/admin")
@@ -26,18 +24,14 @@ public class AdminRestController {
 
     private final DataDefFetcher dataDefFetcher;
     private final IndexService indexService;
-    private final PlaceDAO placeDao;
-    private final IndexerConfiguration configuration;
-    private final Random random = new Random();
+    private final MongoDataDefFileRepository mongoDataDefFileRepository;
 
     @Autowired
     public AdminRestController(DataDefFetcher dataDefFetcher,
-                               IndexService indexService,
-                               PlaceDAO placeDao, IndexerConfiguration configuration) {
+                               IndexService indexService, MongoDataDefFileRepository mongoDataDefFileRepository) {
         this.dataDefFetcher = dataDefFetcher;
         this.indexService = indexService;
-        this.placeDao = placeDao;
-        this.configuration = configuration;
+        this.mongoDataDefFileRepository = mongoDataDefFileRepository;
     }
 
 
@@ -47,14 +41,14 @@ public class AdminRestController {
         LOGGER.info("Reindex uri: '{}'. Full reindex: {}", dataDefUri, fullReindex);
 
         if (dataDefUri != null && dataDefUri.length() > 0) {
-            
+
             try {
                 List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefUri);
                 for (DataDef dataDef : dataDefs) {
                     indexService.indexDataDef(dataDef, fullReindex);
                 }
                 return "Refreshing " + dataDefUri;
-            } catch (RdfFormatException | DataDefFormatException |IOException e) {
+            } catch (RdfFormatException | DataDefFormatException | IOException e) {
                 e.printStackTrace();
                 return e.toString();
             }
@@ -65,9 +59,9 @@ public class AdminRestController {
             return "Refreshing all.";
         }
     }
-    
+
     @RequestMapping("datadefs")
-    public Object listDatadefs(){
-        return configuration.getDataDefUris();
+    public Object listDatadefs() {
+        return mongoDataDefFileRepository.findAll();
     }
 }

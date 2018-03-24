@@ -21,6 +21,32 @@
     <div class="alert alert-success" th:if="${status != null && status.ok == true}" th:text="${status.message}">
         Success.
     </div>
+
+    <div class="alert alert-danger" th:if="${status != null && status.error == true}" th:text="${status.message}">
+        Error
+    </div>
+
+    <!-- FINISHED JOBS -->
+    <div class="alert alert-success" th:if="${indexingJobs != null && !indexingJobs.getFinishedJobs().isEmpty()}" th:each="job: ${indexingJobs.getFinishedJobs()}"
+         th:text="'Indexing finished for '+${job.dataDef.getUri()}+'. Indexed places: '+${job.indexedCount}">
+        Finished jobs
+    </div>
+
+
+    <!-- RUNNING JOBS -->
+    <div class="alert alert-info" th:if="${indexingJobs != null && !indexingJobs.getRunningJobs().isEmpty()}" th:each="job: ${indexingJobs.getRunningJobs()}"
+         th:text="'Indexing in progress for '+${job.getUri()}">
+        Running jobs
+    </div>
+
+    <!--ERROR JOBS-->
+    <div class="alert alert-danger" th:if="${indexingJobs != null && !indexingJobs.getErrorJobs().isEmpty()}" th:each="job: ${indexingJobs.getErrorJobs()}"
+        th:text="'Error while indexing '+${job}">
+        Error jobs
+    </div>
+
+    <!--<p th:text="${indexingJobs.getErrorJobs().toString()}"></p>-->
+
     <div class="row">
         <hr style="width: 100%"/>
     </div>

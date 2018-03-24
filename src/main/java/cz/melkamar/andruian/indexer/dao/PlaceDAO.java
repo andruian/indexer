@@ -1,6 +1,5 @@
 package cz.melkamar.andruian.indexer.dao;
 
-import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import org.slf4j.Logger;
@@ -51,9 +50,9 @@ public class PlaceDAO {
         throw new NotImplementedException();
     }
 
-    public void deletePlacesOfDataDef(DataDef dataDef){
-        LOGGER.debug("Deleting all places from datadef "+dataDef);
-        solrPlaceRepository.deleteAllBySourceDatadef(dataDef.getUri());
+    public void deletePlacesOfDataDefIri(String dataDefIri){
+        LOGGER.debug("Deleting all places from datadef "+dataDefIri);
+        solrPlaceRepository.deleteAllBySourceDatadef(dataDefIri);
     }
 
     public List<Place> getAllPlaces() {
@@ -85,7 +84,7 @@ public class PlaceDAO {
         return result;
     }
 
-    public int getDatadefPlacesCount(DataDef dataDef){
-        return solrPlaceRepository.countAllBySourceDatadef(dataDef.getUri());
+    public int getDatadefPlacesCount(String dataDefIri){
+        return solrPlaceRepository.countAllBySourceDatadef(dataDefIri);
     }
 }

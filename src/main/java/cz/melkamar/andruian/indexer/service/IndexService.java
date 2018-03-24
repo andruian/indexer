@@ -3,25 +3,25 @@ package cz.melkamar.andruian.indexer.service;
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
-import cz.melkamar.andruian.ddfparser.model.SelectProperty;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.MongoDataDefFileRepository;
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
-import cz.melkamar.andruian.indexer.exception.SparqlQueryException;
 import cz.melkamar.andruian.indexer.model.DataDefFile;
-import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
-import cz.melkamar.andruian.indexer.net.SparqlConnector;
-import cz.melkamar.andruian.indexer.rdf.IndexSparqlQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 
 @Service
 public class IndexService {
@@ -29,21 +29,25 @@ public class IndexService {
 
     private final IndexerConfiguration indexerConfiguration;
     private final DataDefFetcher dataDefFetcher;
-    private final SparqlConnector sparqlConnector;
     private final PlaceDAO placeDAO;
     private final MongoDataDefFileRepository datadefFileRepository;
+
+    private final IndexServiceAsyncCall indexServiceAsyncCall;
+
+    private final Map<DataDef, CompletableFuture> indexingJobs;
 
     @Autowired
     public IndexService(IndexerConfiguration indexerConfiguration,
                         DataDefFetcher dataDefFetcher,
-                        SparqlConnector sparqlConnector,
                         PlaceDAO placeDAO,
-                        MongoDataDefFileRepository datadefFileRepository) {
+                        MongoDataDefFileRepository datadefFileRepository,
+                        IndexServiceAsyncCall indexServiceAsyncCall) {
         this.indexerConfiguration = indexerConfiguration;
         this.dataDefFetcher = dataDefFetcher;
-        this.sparqlConnector = sparqlConnector;
         this.placeDAO = placeDAO;
         this.datadefFileRepository = datadefFileRepository;
+        this.indexServiceAsyncCall = indexServiceAsyncCall;
+        indexingJobs = new HashMap<>();
     }
 
     /**
@@ -59,61 +63,88 @@ public class IndexService {
      *                    reindex).
      * @return TODO: maybe no return value is even necessary?
      */
-    @Async
-    public CompletableFuture indexDataDef(DataDef dataDef, boolean fullReindex) {
-        // TODO during fullReindex delete objects that no longer exist from Mongo+Solr
-        LOGGER.info("Indexing data from DataDef {}. Full reindex: {}", dataDef.getUri(), fullReindex);
-
-        // Indexing stuff here
-        IndexSparqlQueryBuilder queryBuilder = new IndexSparqlQueryBuilder(
-                dataDef.getSourceClassDef().getClassUri(),
-                dataDef.getSourceClassDef().getPathToLocationClass(),
-                dataDef.getLocationClassDef().getSparqlEndpoint(),
-                dataDef.getLocationClassDef().getPathToGps(dataDef.getLocationClassDef().getClassUri()).getLatCoord(),
-                dataDef.getLocationClassDef().getPathToGps(dataDef.getLocationClassDef().getClassUri()).getLongCoord()
-        );
-
-        for (SelectProperty selectProperty : dataDef.getSourceClassDef().getSelectProperties()) {
-            queryBuilder.addSelectProperty(selectProperty);
+    public void indexDataDef(DataDef dataDef, boolean fullReindex) {
+        CompletableFuture future = indexingJobs.get(dataDef);
+        if (future != null) {
+            future.cancel(true);
         }
 
-        if (!fullReindex) {
-            for (Place place : placeDAO.getPlacesOfClass(dataDef.getSourceClassDef().getClassUri())) {
-                queryBuilder.excludeUri(place.getUri());
+        indexingJobs.put(dataDef, indexServiceAsyncCall.indexDataDefAsync(dataDef, fullReindex));
+    }
+
+    public List<DataDef> getRunningJobs() {
+        List<DataDef> result = new ArrayList<>();
+        for (Map.Entry<DataDef, CompletableFuture> futureEntry : indexingJobs.entrySet()) {
+            try {
+                if (futureEntry.getValue().getNow(null) == null) result.add(futureEntry.getKey());
+            } catch (Exception  e) {
+                LOGGER.trace("getRunningJobs - " + futureEntry.getKey() + " ended with exception " + e.getMessage());
             }
         }
 
-
-        String query = queryBuilder.build();
-        LOGGER.debug("Query string: \n{}", query);
-        List<Place> places = null;
-        try {
-            places = sparqlConnector.executeIndexQuery(dataDef.getUri(),
-                                                       query,
-                                                       dataDef.getSourceClassDef().getSparqlEndpoint(),
-                                                       dataDef.getSourceClassDef().getSelectPropertiesNames());
-        } catch (SparqlQueryException e) {
-            LOGGER.error("An error occurred while performing a SPARQL query on endpoint " + dataDef.getSourceClassDef()
-                    .getSparqlEndpoint(), e);
-            e.printStackTrace();
-            return CompletableFuture.completedFuture(null);
-        }
-
-        LOGGER.info("Indexed {} places from DataDef at {}:", places.size(), dataDef.getUri());
-        for (Place place : places) {
-            LOGGER.debug(place.toString());
-        }
-
-        placeDAO.savePlaces(places);
-
-        LOGGER.info("Finished indexing {}", dataDef.getUri());
-        return CompletableFuture.completedFuture(null);
+        LOGGER.trace("getRunningJobs - " + result.size() + " running.");
+        return result;
     }
+
+    public static class FinishedJobReport {
+        public final DataDef dataDef;
+        public final int indexedCount;
+
+        public FinishedJobReport(DataDef dataDef, int indexedCount) {
+            this.dataDef = dataDef;
+            this.indexedCount = indexedCount;
+        }
+    }
+
+    public List<FinishedJobReport> getFinishedJobs() {
+        List<FinishedJobReport> result = new ArrayList<>();
+        for (Map.Entry<DataDef, CompletableFuture> futureEntry : indexingJobs.entrySet()) {
+            try {
+                Object indexedCount = futureEntry.getValue().getNow(null);
+                if (indexedCount != null){
+                    result.add(new FinishedJobReport(futureEntry.getKey(), (Integer) indexedCount));
+                }
+            } catch (CancellationException | CompletionException e) {
+                LOGGER.trace("getRunningJobs - " + futureEntry.getKey() + " ended with exception " + e.getMessage());
+            }
+        }
+
+        // Remove all errors that have been reported so that they are not shown next time
+        for (FinishedJobReport jobReport : result) {
+            indexingJobs.remove(jobReport.dataDef);
+        }
+
+        LOGGER.trace("getFinishedJobs - " + result.size() + " finished.");
+        return result;
+    }
+
+    public Map<DataDef, Exception> getErroredJobs() {
+        Map<DataDef, Exception> result = new HashMap<>();
+
+        for (Map.Entry<DataDef, CompletableFuture> futureEntry : indexingJobs.entrySet()) {
+            try {
+                futureEntry.getValue().getNow(null);
+            } catch (CancellationException | CompletionException e) {
+                LOGGER.trace("getErroredJobs - " + futureEntry.getKey() + " ended with exception " + e.getMessage());
+                result.put(futureEntry.getKey(), e);
+            }
+        }
+
+        // Remove all errors that have been reported so that they are not shown next time
+        for (DataDef dataDef : result.keySet()) {
+            indexingJobs.remove(dataDef);
+        }
+
+        LOGGER.trace("getErroredJobs - " + result.size() + " errors.");
+        return result;
+    }
+
+
 
     public void reindexAll(boolean fullReindex) {
         LOGGER.warn("Reindexing...");
 
-        String[] dataDefUris = indexerConfiguration.getDataDefUris();
+        String[] dataDefUris = datadefFileRepository.findAll().stream().map(DataDefFile::getFileUrl).toArray(String[]::new);
         for (String dataDefUri : dataDefUris) {
             List<DataDef> dataDefs = null;
             try {
@@ -129,15 +160,16 @@ public class IndexService {
         }
     }
 
-    public void dropData(DataDef dataDef) {
-        placeDAO.deletePlacesOfDataDef(dataDef);
+    public void dropData(String dataDefIri) {
+        placeDAO.deletePlacesOfDataDefIri(dataDefIri);
     }
 
-    public int getIndexedPlacesCount(DataDef dataDef) {
-        return placeDAO.getDatadefPlacesCount(dataDef);
+    public int getIndexedPlacesCount(String dataDefIri) {
+        return placeDAO.getDatadefPlacesCount(dataDefIri);
     }
 
-    public void addDatadef(String dataDefUri) {
-        datadefFileRepository.insert(new DataDefFile(dataDefUri));
+    public void addDatadefFile(String dataDefFileUrl) throws RdfFormatException, IOException, DataDefFormatException {
+        List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFileUrl);
+        datadefFileRepository.insert(new DataDefFile(dataDefFileUrl, dataDefs.stream().map(DataDef::getUri).collect(Collectors.toList())));
     }
 }
