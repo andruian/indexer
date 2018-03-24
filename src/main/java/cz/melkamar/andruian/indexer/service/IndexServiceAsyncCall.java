@@ -76,10 +76,7 @@ public class IndexServiceAsyncCall {
             throw new DataDefIndexException(e.getMessage());
         }
 
-        LOGGER.info("Indexed {} places from DataDef at {}:", places.size(), dataDef.getUri());
-        for (Place place : places) {
-            LOGGER.debug(place.toString());
-        }
+        LOGGER.info("Fetched {} places from DataDef at {}:", places.size(), dataDef.getUri());
 
         placeDAO.savePlaces(places);
 

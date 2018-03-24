@@ -57,5 +57,5 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-solr:2.0.0.RELEASE")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb:2.0.0.RELEASE")
 
-    compile('cz.melkamar.andruian:ddfparser:1.0.6')
+    compile('cz.melkamar.andruian:ddfparser:1.0.7')
 }
