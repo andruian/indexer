@@ -5,18 +5,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class IndexerConfiguration {
-//    public static final String DATADEFS = "dataDefs";
     public static final String INDEX_CRON = "indexing.cron";
     public static final String ONSTART_REINDEX = "indexing.onstart";
 
     public static final String DB_SOLR_URL = "db.solr.url";
     public static final String DB_SOLR_COLLECTION = "db.solr.collection";
-    
+
     public static final String ADMIN_USERNAME = "admin.username";
     public static final String ADMIN_PASSWORD = "admin.password";
 
-//    @Value("${" + DATADEFS + "}")
-//    private String[] dataDefs;
+    public static final String MAX_POINTS_SHOWN = "ui.maxPointsShown";
 
     @Value("${" + INDEX_CRON + ":#{null}}")
     private String indexingCron;
@@ -34,9 +32,13 @@ public class IndexerConfiguration {
     @Value("${" + ADMIN_PASSWORD + "}")
     private String adminPassword;
 
-//    public String[] getDataDefUris() {
-//        return dataDefs;
-//    }
+    @Value("${" + MAX_POINTS_SHOWN + "}")
+    private int uiMaxPointsShown;
+
+
+    public int getUiMaxPointsShown() {
+        return uiMaxPointsShown;
+    }
 
     public String getIndexingCron() {
         return indexingCron;

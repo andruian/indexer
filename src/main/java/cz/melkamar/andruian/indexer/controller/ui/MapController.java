@@ -1,5 +1,6 @@
 package cz.melkamar.andruian.indexer.controller.ui;
 
+import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.controller.Util;
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
@@ -19,13 +20,14 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class MapController {
-
-
     private final QueryService queryService;
+    private final IndexerConfiguration indexerConfiguration;
 
     @Autowired
-    public MapController(QueryService queryService) {
+    public MapController(QueryService queryService,
+                         IndexerConfiguration indexerConfiguration) {
         this.queryService = queryService;
+        this.indexerConfiguration = indexerConfiguration;
     }
 
     @ModelAttribute
@@ -52,10 +54,11 @@ public class MapController {
 
         try {
             List<Place> places = queryService.query(type, latitude, longitude, radius);
-            List<Loc> l = places.stream()
+            List<Loc> l = places.stream().limit(indexerConfiguration.getUiMaxPointsShown())
                     .map(place -> new Loc(place.getLatPos(), place.getLongPos()))
                     .collect(Collectors.toList());
             model.addAttribute("points", l);
+            model.addAttribute("totalPointsFound", places.size());
 
         } catch (QueryFormatException e) {
             e.printStackTrace();

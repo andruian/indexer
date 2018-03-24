@@ -27,6 +27,9 @@
             <p th:if="${points} != null">
                 Objects shown: <span th:text="${points.size()}">0</span>
             </p>
+            <p th:if="${totalPointsFound} != null">
+                Objects found: <span th:text="${totalPointsFound}">0</span>
+            </p>
 
             <div class="alert alert-danger" th:if="${errors != null && errors.query != null}" th:text="${errors.query}">
                 An error occurred when executing the query.
