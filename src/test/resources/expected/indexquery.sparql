@@ -6,7 +6,7 @@ prefix s: <http://schema.org/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
 
-SELECT distinct ?dataObj ?locationObj ?lat ?long ?dataClassType ?__prefLab__ ?__name__ ?selectA ?selectB
+SELECT distinct ?dataObj ?locationObj ?lat ?long ?dataClassType ?__prefLab__ ?__name__ ?selectA ?selectB 
 WHERE {
   BIND(<[dataclassuri]> as ?dataClassType)
 
