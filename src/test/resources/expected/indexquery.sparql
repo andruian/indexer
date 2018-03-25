@@ -2,17 +2,24 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX eu: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
 PREFIX ru: <http://purl.org/imbi/ru-meta.owl#>
 prefix ex: <http://example.org/>
-prefix ruian: <http://ruian.linked.opendata.cz/ontology/>
 prefix s: <http://schema.org/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
 
-SELECT distinct ?dataObj ?locationObj ?lat ?long ?dataClassType ?selectA ?selectB 
+SELECT distinct ?dataObj ?locationObj ?lat ?long ?dataClassType ?__prefLab__ ?__name__ ?selectA ?selectB
 WHERE {
   BIND(<[dataclassuri]> as ?dataClassType)
 
   ?dataObj a <[dataclassuri]>;
          <a>/<b>/<c> ?locationObj;
          .
+
+  OPTIONAL {
+    ?dataObj skos:prefLabel ?__prefLab__.
+  }
+  OPTIONAL {
+    ?dataObj s:name ?__name.
+  }
 
   #
   # Optional filter when reindexingto exclude all objects that already exist
@@ -38,8 +45,12 @@ WHERE {
   #   ?dataObj ex:a/ex:b/ex:c ?selectPropA .
   #
   # There will be one line per each selectProp
-  ?dataObj <sA>/<x> ?selectA .
+  OPTIONAL {
+?dataObj <sA>/<x> ?selectA .
+}
+OPTIONAL {
 ?dataObj <sB>/<y> ?selectB .
+}
 
 
   #
@@ -51,13 +62,5 @@ WHERE {
                  <path>/<to>/<long> ?long;
     .
 
-    #
-    # RUIAN-specific
-    #   For some reason RUIAN has two values for object's coordinates.
-    #   Make sure we get the one we expect by filtering.
-    FILTER(
-      datatype(?lat) = xsd:decimal &&
-      datatype(?long) = xsd:decimal
-    )
   }
 }
