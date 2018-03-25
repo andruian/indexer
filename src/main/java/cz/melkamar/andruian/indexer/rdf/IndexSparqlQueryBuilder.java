@@ -44,11 +44,11 @@ public class IndexSparqlQueryBuilder {
     private List<SelectProperty> selectProperties;
     private List<String> excludeDataObjUris;
 
-    public void addSelectProperty(SelectProperty selectProperty){
+    public void addSelectProperty(SelectProperty selectProperty) {
         selectProperties.add(selectProperty);
     }
 
-    public void excludeUri(String excludeUri){
+    public void excludeUri(String excludeUri) {
         excludeDataObjUris.add(excludeUri);
     }
 
@@ -115,11 +115,13 @@ public class IndexSparqlQueryBuilder {
         for (SelectProperty selectProperty : selectProperties) {
             checkReservedVariableUsed(selectProperty.getName());
 
-            builder.append("?dataObj ")
+            builder.append("OPTIONAL {\n")
+                    .append("?dataObj ")
                     .append(selectProperty.getPath().toString())
                     .append(" ?")
                     .append(selectProperty.getName())
-                    .append(" .\n");
+                    .append(" .\n")
+                    .append("}\n");
         }
         return builder.toString();
     }

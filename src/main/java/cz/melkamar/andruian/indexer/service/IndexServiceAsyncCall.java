@@ -77,8 +77,12 @@ public class IndexServiceAsyncCall {
         }
 
         LOGGER.info("Fetched {} places from DataDef at {}:", places.size(), dataDef.getUri());
-
-        placeDAO.savePlaces(places);
+        try {
+            placeDAO.savePlaces(places);
+        } catch (Exception e){
+            LOGGER.error("Error while saving places "+e.getMessage(), e);
+            throw new DataDefIndexException("Error while saving places "+e.getMessage(), e);
+        }
 
         LOGGER.info("Finished indexing {}", dataDef.getUri());
         return CompletableFuture.completedFuture(places.size());

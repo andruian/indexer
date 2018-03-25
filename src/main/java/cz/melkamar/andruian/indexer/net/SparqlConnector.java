@@ -62,10 +62,12 @@ public class SparqlConnector {
         for (String propName : selectProperties) {
             RDFNode propertyRdfNode = querySolution.get(propName);
 
-            if (propertyRdfNode.isLiteral()) {
-                properties.put(propName, propertyRdfNode.asLiteral().getValue().toString());
-            } else { // Property is resource, just get its uri
-                properties.put(propName, propertyRdfNode.asResource().getURI());
+            if (propertyRdfNode != null) { // Properties are optional
+                if (propertyRdfNode.isLiteral()) {
+                    properties.put(propName, propertyRdfNode.asLiteral().getValue().toString());
+                } else { // Property is resource, just get its uri
+                    properties.put(propName, propertyRdfNode.asResource().getURI());
+                }
             }
         }
 
