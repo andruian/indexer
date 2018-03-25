@@ -14,22 +14,7 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class IndexerApplicationTests {
-
-
-    @Qualifier("solrPlaceRepository")
-    @Autowired
-    private SolrPlaceRepository placeRepository;
-
     @Test
     public void contextLoads() {
     }
-
-    @Test
-    public void readStuff() {
-        List<Place> solrPlaces = placeRepository.findByType("myclassuri");
-        for (Place place : solrPlaces) {
-            System.out.println(place);
-        }
-    }
-
 }
