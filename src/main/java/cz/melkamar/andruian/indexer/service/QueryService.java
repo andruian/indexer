@@ -34,7 +34,8 @@ public class QueryService {
             if (checkLatLongR(latitude, longitude, radius)) data = placeDAO.getPlacesAroundPointOfClass(type, latitude, longitude, radius);
             else data = placeDAO.getPlacesOfClass(type);
         }
-        
+
+        LOGGER.trace("Query complete. Returning "+data.size());
         return data;
     }
 
