@@ -4,7 +4,7 @@
 
 ## Installation
 - The easiest way to set up the index server is using Docker. Have a look at the provided 
-[docker-compose file](docker-compose.yml) which will get you up and running after just a few adjustments.
+[docker-compose file](docker/docker-compose.yml) which will get you up and running after just a few adjustments.
 - You will want to configure data definition URLs, admin password and Solr/MongoDB/SPARQL URIs by supplying a 
 `application.properties` file to the server. An example can be found [here](src/main/resources/application.properties).
 The server will automatically use a property file when located in the working directory. Example:
