@@ -53,7 +53,7 @@ services:
   #
   indexer:
     container_name: indexer
-    image: openjdk:8
+    image: melkamar/indexer
     ports:
       - 8080:8080
     volumes:
