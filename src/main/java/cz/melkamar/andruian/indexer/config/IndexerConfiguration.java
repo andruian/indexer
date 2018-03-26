@@ -15,6 +15,7 @@ public class IndexerConfiguration {
     public static final String ADMIN_PASSWORD = "admin.password";
 
     public static final String MAX_POINTS_SHOWN = "ui.maxPointsShown";
+    public static final String LOGGING_FILE = "logging.file";
 
     @Value("${" + INDEX_CRON + ":#{null}}")
     private String indexingCron;
@@ -35,6 +36,12 @@ public class IndexerConfiguration {
     @Value("${" + MAX_POINTS_SHOWN + "}")
     private int uiMaxPointsShown;
 
+    @Value("${" + LOGGING_FILE + "}")
+    private String loggingFile;
+
+    public String getLoggingFile() {
+        return loggingFile;
+    }
 
     public int getUiMaxPointsShown() {
         return uiMaxPointsShown;

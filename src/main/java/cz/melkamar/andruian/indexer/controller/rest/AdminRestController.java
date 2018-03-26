@@ -4,6 +4,7 @@ import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
 import cz.melkamar.andruian.indexer.Util;
+import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.dao.MongoDataDefFileRepository;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -25,13 +25,17 @@ public class AdminRestController {
     private final DataDefFetcher dataDefFetcher;
     private final IndexService indexService;
     private final MongoDataDefFileRepository mongoDataDefFileRepository;
+    private final IndexerConfiguration indexerConfiguration;
 
     @Autowired
     public AdminRestController(DataDefFetcher dataDefFetcher,
-                               IndexService indexService, MongoDataDefFileRepository mongoDataDefFileRepository) {
+                               IndexService indexService,
+                               MongoDataDefFileRepository mongoDataDefFileRepository,
+                               IndexerConfiguration indexerConfiguration) {
         this.dataDefFetcher = dataDefFetcher;
         this.indexService = indexService;
         this.mongoDataDefFileRepository = mongoDataDefFileRepository;
+        this.indexerConfiguration = indexerConfiguration;
     }
 
 
@@ -63,7 +67,7 @@ public class AdminRestController {
     @GetMapping("log")
     public String log() {
         try {
-            String logStr = Util.readFile("indexer.log", StandardCharsets.UTF_8);
+            String logStr = Util.readFile(indexerConfiguration.getLoggingFile(), StandardCharsets.UTF_8);
             return "<pre>"+logStr+"</pre>";
         } catch (IOException e) {
             e.printStackTrace();

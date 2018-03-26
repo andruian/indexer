@@ -52,6 +52,7 @@ services:
             - fuseki
     ports:
       - 8080:8080
+    volumes:
+      - /indexer/logs
     # To provide custom application.properties, mount it using the following:
-    #volumes:
     #  - /path/to/application.properties:/indexer/application.properties
