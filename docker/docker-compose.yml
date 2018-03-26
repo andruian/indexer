@@ -47,9 +47,9 @@ services:
     container_name: indexer
     image: melkamar/indexer
     depends_on:
-            - solr
-            - mongo
-            - fuseki
+      - solr
+      - mongo
+      - fuseki
     ports:
       - 8080:8080
     volumes:
