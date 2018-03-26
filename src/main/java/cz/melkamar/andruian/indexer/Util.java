@@ -5,6 +5,9 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Util {
     public static String readResourceFileToString(String resourcePath) throws IOException {
@@ -17,5 +20,10 @@ public class Util {
         File file = new File(classLoader.getResource(resourcePath).getFile());
 
         return FileUtils.readFileToString(file, "utf-8");
+    }
+
+    public static String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 }

@@ -3,18 +3,18 @@ package cz.melkamar.andruian.indexer.controller.rest;
 import cz.melkamar.andruian.ddfparser.exception.DataDefFormatException;
 import cz.melkamar.andruian.ddfparser.exception.RdfFormatException;
 import cz.melkamar.andruian.ddfparser.model.DataDef;
+import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.dao.MongoDataDefFileRepository;
 import cz.melkamar.andruian.indexer.net.DataDefFetcher;
 import cz.melkamar.andruian.indexer.service.IndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -57,6 +57,17 @@ public class AdminRestController {
             // TODO at least list available URIs
             indexService.reindexAll(fullReindex);
             return "Refreshing all.";
+        }
+    }
+
+    @GetMapping("log")
+    public String log() {
+        try {
+            String logStr = Util.readFile("indexer.log", StandardCharsets.UTF_8);
+            return "<pre>"+logStr+"</pre>";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Log file not found.";
         }
     }
 

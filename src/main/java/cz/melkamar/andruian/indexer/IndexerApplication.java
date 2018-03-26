@@ -18,12 +18,6 @@ public class IndexerApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(IndexerApplication.class, args);
 
-        LOGGER.trace("trace");
-        LOGGER.debug("debug");
-        LOGGER.info("info");
-        LOGGER.warn("warn");
-        LOGGER.error("error");
-
         try {
             context.getBean(PostStartupService.class).postStartup();
         } catch (Exception e) {

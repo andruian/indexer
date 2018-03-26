@@ -41,11 +41,21 @@
 
     <!--ERROR JOBS-->
     <div class="alert alert-danger" th:if="${indexingJobs != null && !indexingJobs.getErrorJobs().isEmpty()}" th:each="job: ${indexingJobs.getErrorJobs()}"
-        th:text="'Error while indexing '+${job}">
+         th:text="'Error while indexing '+${job}">
         Error jobs
     </div>
 
     <!--<p th:text="${indexingJobs.getErrorJobs().toString()}"></p>-->
+
+    <div class="row">
+        <hr style="width: 100%"/>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <a href="/api/admin/log" class="btn btn-info" role="button">Show indexer log</a>
+        </div>
+    </div>
 
     <div class="row">
         <hr style="width: 100%"/>
