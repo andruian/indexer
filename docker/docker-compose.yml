@@ -11,6 +11,9 @@ services:
       - /fuseki # To persist datasets across restarts in /data/fuseki folder
     ports:
       - 3030:3030
+    logging:
+      options:
+        max-size: 50m
     environment:
       - ADMIN_PASSWORD=some-secret
 
@@ -23,6 +26,9 @@ services:
     image: mongo
     ports:
       - 27017:27017
+    logging:
+      options:
+        max-size: 50m
     volumes:
       - /mongo # To persist datasets across restarts in /data/fuseki folder
 
@@ -37,6 +43,9 @@ services:
     image: melkamar/solr-indexer
     ports:
       - 8983:8983
+    logging:
+      options:
+        max-size: 50m
     volumes:
       - /opt/solr/server/solr/mycores
   #
@@ -52,6 +61,9 @@ services:
       - fuseki
     ports:
       - 8080:8080
+    logging:
+      options:
+        max-size: 50m
     volumes:
       - /indexer/logs
     # To provide custom application.properties, mount it using the following:
