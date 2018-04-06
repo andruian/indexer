@@ -14,3 +14,4 @@ See [schema.xml](andruian_configset/conf/schema.xml) for details about the Solr 
 - Spring spatial queries: https://github.com/spring-projects/spring-data-solr/blob/master/README.md
 - Spatial query in CrudRepository is argument-sensitive: https://jira.spring.io/browse/DATASOLR-451
 - http://www.baeldung.com/spring-data-solr
+
