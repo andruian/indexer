@@ -21,3 +21,4 @@ application.properties indexer-1.0.0.jar
 - Build the JAR
 - Tag the commit with the version, e.g. `1.2.3`
 - Create a GitHub Release, upload the JAR there.
+
