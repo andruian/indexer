@@ -116,7 +116,7 @@
     <field name="_root_" type="string" indexed="true" stored="false" docValues="false" />
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
 
-    <field name="location" type="location" indexed="true" stored="true"/>
+    <field name="location" type="location_rpt" indexed="true" stored="true"/>
     <field name="type" type="string" multiValued="false" indexed="false" stored="true"/>
     <field name="iri" type="string" multiValued="false" indexed="true" stored="true"/>
     <field name="locationObjectIri" type="string" multiValued="false" indexed="true" stored="true"/>
