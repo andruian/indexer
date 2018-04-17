@@ -1,6 +1,5 @@
 package cz.melkamar.andruian.indexer.controller.rest;
 
-import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import cz.melkamar.andruian.indexer.service.QueryService;
@@ -24,11 +23,10 @@ public class DataQueryRestController {
     }
 
     /**
-     *
      * @param type
-     * @param latitude gps
-     * @param longitude gps
-     * @param radius kilometers
+     * @param latitude     gps
+     * @param longitude    gps
+     * @param radius       kilometers
      * @param showCount
      * @param clusterLimit
      * @return
@@ -41,17 +39,18 @@ public class DataQueryRestController {
             @RequestParam(value = "r", required = false) Double radius,
             @RequestParam(value = "count", required = false) boolean showCount,
             @RequestParam(value = "clusterLimit", required = false) Integer clusterLimit
-            ) {
+    ) {
         try {
             List<Place> places = queryService.query(type, latitude, longitude, radius);
             if (showCount) return new QueryResponse(QueryResponse.RESPONSE_COUNT, places.size());
 
             // No clustering limit set or number of places lower than the limit
-            if (clusterLimit == null || places.size() <= clusterLimit){
+            if (clusterLimit == null || places.size() <= clusterLimit) {
                 return new QueryResponse(QueryResponse.RESPONSE_ALL, places);
             }
 
-            return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED, queryService);
+            return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED,
+                                     queryService.clusteredQuery(type, latitude, longitude, radius));
 
         } catch (QueryFormatException e) {
             e.printStackTrace();
@@ -59,10 +58,6 @@ public class DataQueryRestController {
         }
     }
 
-    private Object nonClusteredQuery(){
-        throw new NotImplementedException();
-    }
-    
     static class QueryResponse {
         public static final int RESPONSE_COUNT = 0;
         public static final int RESPONSE_ALL = 1;
@@ -76,10 +71,4 @@ public class DataQueryRestController {
             this.responseBody = responseBody;
         }
     }
-
-//    @RequestMapping("/config")
-//    public String[] config(){
-////        fakeDataRepo.getConfig().forEach(System.out::println);
-//        return fakeDataRepo.getConfig();
-//    }
 }

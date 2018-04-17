@@ -2,7 +2,6 @@ package cz.melkamar.andruian.indexer.dao;
 
 import cz.melkamar.andruian.indexer.Util;
 import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
-import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.model.place.PlaceCluster;
 import cz.melkamar.andruian.indexer.net.NetHelper;
 import org.json.JSONArray;
@@ -37,38 +36,47 @@ public class ClusteredPlaceDAO {
         LOGGER.debug("Cluster | Using query: " + query);
 
         String response = netHelper.httpGet(query);
-
-//        solrPlaceRepository.findAll().forEach(result::add);
-
-        return result;
+        return parseClusterQueryResponse(response);
     }
 
     public List<PlaceCluster> getPlacesOfClass(String classUri) {
-//        return solrPlaceRepository.findByType(classUri);
-        throw new NotImplementedException();
+        LOGGER.debug("Cluster | Fetching places of type "+classUri);
+        List<PlaceCluster> result = new ArrayList<>();
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+                .setType(classUri)
+                .build();
+        LOGGER.debug("Cluster | Using query: " + query);
+
+        String response = netHelper.httpGet(query);
+        return parseClusterQueryResponse(response);
     }
 
     public List<PlaceCluster> getPlacesAroundPoint(double latCoord, double longCoord, double radius) {
-        throw new NotImplementedException();
-//        LOGGER.debug("Cluster | getPlacesAroundPoint {} {} {}", latCoord, longCoord, radius);
-//        List<Place> result = solrPlaceRepository.findByLocationWithin(new Point(latCoord, longCoord),
-//                                                                      new Distance(radius));
-//        LOGGER.debug("Cluster | getPlacesAroundPoint - found {} Places", result.size());
-//        return result;
+        LOGGER.debug("Cluster | getPlacesAroundPoint {} {} {}", latCoord, longCoord, radius);
+        List<PlaceCluster> result = new ArrayList<>();
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+                .setLocation(latCoord, longCoord, radius)
+                .build();
+        LOGGER.debug("Cluster | Using query: " + query);
+
+        String response = netHelper.httpGet(query);
+        return parseClusterQueryResponse(response);
     }
 
     public List<PlaceCluster> getPlacesAroundPointOfClass(String classUri,
                                                           double latCoord,
                                                           double longCoord,
                                                           double radius) {
-        throw new NotImplementedException();
-//        LOGGER.debug("Cluster | getPlacesAroundPointOfClass {} {} {} {}", classUri, latCoord, longCoord, radius);
-//        List<Place> result = solrPlaceRepository.findByTypeAndLocationWithin(classUri,
-//                                                                             new Point(latCoord, longCoord),
-//                                                                             new Distance(radius));
-//        LOGGER.debug("Cluster | getPlacesAroundPointOfClass - found {} Places", result.size());
-//
-//        return result;
+        LOGGER.debug("Cluster | getPlacesAroundPointOfClass {} {} {} {}", classUri, latCoord, longCoord, radius);
+        List<PlaceCluster> result = new ArrayList<>();
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+                .setLocation(latCoord, longCoord, radius)
+                .setType(classUri)
+                .build();
+        LOGGER.debug("Cluster | Using query: " + query);
+
+        String response = netHelper.httpGet(query);
+        return parseClusterQueryResponse(response);
     }
 
     public List<PlaceCluster> parseClusterQueryResponse(String response) {
@@ -101,10 +109,11 @@ public class ClusteredPlaceDAO {
                                                                   new Util.Rect(minX, minY, maxX, maxY),
                                                                   col,
                                                                   row);
-                result.add(new PlaceCluster(placeCount, "", clusterPos.lat, clusterPos.lng));
+                result.add(new PlaceCluster(placeCount, clusterPos.lat, clusterPos.lng));
             }
         }
 
+        LOGGER.debug("Cluster | parsed " + result.size() + " clusters");
         return result;
     }
 

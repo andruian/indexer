@@ -20,14 +20,16 @@ public class ClusterQueryBuilder {
         this.collection = collection;
     }
 
-    public void setType(String type){
+    public ClusterQueryBuilder setType(String type){
         this.type = type;
+        return this;
     }
 
-    public void setLocation(double lat, double lng, double radius){
+    public ClusterQueryBuilder setLocation(double lat, double lng, double radius){
         this.lat = lat;
         this.lng = lng;
         this.radius = radius;
+        return this;
     }
 
     /**
