@@ -20,12 +20,12 @@ public class ClusterQueryBuilder {
         this.collection = collection;
     }
 
-    public ClusterQueryBuilder setType(String type){
+    public ClusterQueryBuilder setType(String type) {
         this.type = type;
         return this;
     }
 
-    public ClusterQueryBuilder setLocation(double lat, double lng, double radius){
+    public ClusterQueryBuilder setLocation(double lat, double lng, double radius) {
         this.lat = lat;
         this.lng = lng;
         this.radius = radius;
@@ -45,7 +45,7 @@ public class ClusterQueryBuilder {
      */
     public String build() {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(solrUrl);
-        builder.path("+" + collection);
+        builder.path("/" + collection);
         builder.path("/select");
 
         builder.queryParam("facet.heatmap", "location");
@@ -61,7 +61,7 @@ public class ClusterQueryBuilder {
             builder.queryParam("facet.heatmap.geom",
                                "[\"" + boundRect.minX + " " + boundRect.minY + "\" " +
                                        "TO " +
-                                       "\"" + boundRect.maxX + " " + boundRect.maxY + "50.01\"]");
+                                       "\"" + boundRect.maxX + " " + boundRect.maxY + "\"]");
         }
 
         if (type != null) builder.queryParam("q", "type:\"" + type + "\"");

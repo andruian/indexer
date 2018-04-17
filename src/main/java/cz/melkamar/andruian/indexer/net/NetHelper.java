@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @Component
 public class NetHelper {
@@ -17,6 +20,14 @@ public class NetHelper {
     }
 
     public String httpGet(String uri) {
+        return httpGet(UriComponentsBuilder.fromUriString(uri).build().toUri());
+    }
+
+    public String httpGetFromEncodedUri(String uri) {
+        return httpGet(UriComponentsBuilder.fromUriString(uri).build(true).toUri());
+    }
+
+    private String httpGet(URI uri) {
         LOGGER.info("HTTP GET {}", uri);
 
         String payload = restTemplate.getForObject(uri, String.class);

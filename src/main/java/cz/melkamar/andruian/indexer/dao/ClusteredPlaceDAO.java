@@ -35,19 +35,19 @@ public class ClusteredPlaceDAO {
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
 
-        String response = netHelper.httpGet(query);
+        String response = netHelper.httpGetFromEncodedUri(query);
         return parseClusterQueryResponse(response);
     }
 
     public List<PlaceCluster> getPlacesOfClass(String classUri) {
-        LOGGER.debug("Cluster | Fetching places of type "+classUri);
+        LOGGER.debug("Cluster | Fetching places of type " + classUri);
         List<PlaceCluster> result = new ArrayList<>();
         String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
                 .setType(classUri)
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
 
-        String response = netHelper.httpGet(query);
+        String response = netHelper.httpGetFromEncodedUri(query);
         return parseClusterQueryResponse(response);
     }
 
@@ -59,7 +59,7 @@ public class ClusteredPlaceDAO {
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
 
-        String response = netHelper.httpGet(query);
+        String response = netHelper.httpGetFromEncodedUri(query);
         return parseClusterQueryResponse(response);
     }
 
@@ -75,7 +75,7 @@ public class ClusteredPlaceDAO {
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
 
-        String response = netHelper.httpGet(query);
+        String response = netHelper.httpGetFromEncodedUri(query);
         return parseClusterQueryResponse(response);
     }
 
@@ -94,6 +94,17 @@ public class ClusteredPlaceDAO {
         double minY = locationJson.getDouble(11);
         double maxY = locationJson.getDouble(13);
         JSONArray counts = locationJson.getJSONArray(15);
+
+//        for (int row = 0; row < rows; row++) {
+//            for (int col = 0; col < columns; col++) {
+//                Util.LatLng clusterPos = calculateClusterPosition(columns,
+//                                                                  rows,
+//                                                                  new Util.Rect(minX, minY, maxX, maxY),
+//                                                                  col,
+//                                                                  row);
+//                result.add(new PlaceCluster(1, clusterPos.lat, clusterPos.lng));
+//            }
+//        }
 
         for (int row = 0; row < counts.length(); row++) {
             if (counts.isNull(row)) continue;
@@ -120,12 +131,15 @@ public class ClusteredPlaceDAO {
     public Util.LatLng calculateClusterPosition(int columns, int rows, Util.Rect boundingRect, int colIdx, int rowIdx) {
         double lat = boundingRect.maxY
                 - rowIdx * (boundingRect.maxY - boundingRect.minY) / rows
-                + (boundingRect.maxY - boundingRect.minY) / rows / 2;
+                - (boundingRect.maxY - boundingRect.minY) / rows / 2;
 
         double lng = boundingRect.minX
-                + colIdx * (boundingRect.maxX - boundingRect.minX) / colIdx
+                + colIdx * (boundingRect.maxX - boundingRect.minX) / columns
                 + (boundingRect.maxX - boundingRect.minX) / columns / 2;
 
+        LOGGER.trace("clusterPos: " + colIdx + "," + rowIdx + " (" + boundingRect + ") cols:" + columns + " rows:" + rows + " -> " + new Util.LatLng(
+                lat,
+                lng));
         return new Util.LatLng(lat, lng);
     }
 

@@ -39,6 +39,16 @@ public class Util {
             this.maxX = maxX;
             this.maxY = maxY;
         }
+
+        @Override
+        public String toString() {
+            return "Rect{" +
+                    "minX=" + minX +
+                    ", minY=" + minY +
+                    ", maxX=" + maxX +
+                    ", maxY=" + maxY +
+                    '}';
+        }
     }
 
     public static class LatLng {
@@ -48,6 +58,15 @@ public class Util {
         public LatLng(double lat, double lng) {
             this.lat = lat;
             this.lng = lng;
+        }
+
+        @Override
+        public String
+        toString() {
+            return "LatLng{" +
+                    "lat=" + lat +
+                    ", lng=" + lng +
+                    '}';
         }
     }
 }

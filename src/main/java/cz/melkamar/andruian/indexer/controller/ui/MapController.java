@@ -4,6 +4,7 @@ import cz.melkamar.andruian.indexer.config.IndexerConfiguration;
 import cz.melkamar.andruian.indexer.controller.Util;
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
+import cz.melkamar.andruian.indexer.model.place.PlaceCluster;
 import cz.melkamar.andruian.indexer.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,13 +32,13 @@ public class MapController {
     }
 
     @ModelAttribute
-    public void addAttributes(Model model){
+    public void addAttributes(Model model) {
         Util.addPrincipalAttribute(model);
     }
 
     @GetMapping("/")
-    public String mainPage(Model model){
-        model.addAttribute("queryAttrs", new QueryAttrs(null, null, null, null));
+    public String mainPage(Model model) {
+        model.addAttribute("queryAttrs", new QueryAttrs(null, null, null, null, false));
         model.addAttribute("errors", new Errors());
         model.addAttribute("module", "map");
         return "map";
@@ -48,27 +49,40 @@ public class MapController {
                           @RequestParam(value = "lat", required = false) Double latitude,
                           @RequestParam(value = "long", required = false) Double longitude,
                           @RequestParam(value = "r", required = false) Double radius,
+                          @RequestParam(value = "cluster", required = false) Boolean cluster,
                           Model model) {
 
         Errors errors = new Errors();
 
         try {
-            List<Place> places = queryService.query(type, latitude, longitude, radius);
-            List<Loc> l = places.stream().limit(indexerConfiguration.getUiMaxPointsShown())
-                    .map(place -> new Loc(place.getLatPos(), place.getLongPos()))
-                    .collect(Collectors.toList());
+            List<Loc> l = null;
+
+            if (cluster == null || !cluster) {
+                List<Place> places = queryService.query(type, latitude, longitude, radius);
+                l = places.stream().limit(indexerConfiguration.getUiMaxPointsShown())
+                        .map(place -> new Loc(place.getLatPos(), place.getLongPos()))
+                        .collect(Collectors.toList());
+                model.addAttribute("totalPointsFound", places.size());
+            } else {
+                List<PlaceCluster> clusters = queryService.clusteredQuery(type, latitude, longitude, radius);
+                l = clusters.stream()
+                        .map(placeCluster -> new Loc(placeCluster.getLatPos(), placeCluster.getLongPos()))
+                        .collect(Collectors.toList());
+
+                model.addAttribute("totalPointsFound", clusters.size());
+            }
+
             model.addAttribute("points", l);
-            model.addAttribute("totalPointsFound", places.size());
 
         } catch (QueryFormatException e) {
             e.printStackTrace();
             errors.query = "An error occurred when executing the query. " + e.getMessage();
         }
         if (latitude != null && longitude != null) model.addAttribute("pos", new Loc(latitude, longitude));
-        model.addAttribute("queryAttrs", new QueryAttrs(type, latitude, longitude, radius));
+        model.addAttribute("queryAttrs", new QueryAttrs(type, latitude, longitude, radius, cluster));
         model.addAttribute("errors", errors);
         model.addAttribute("module", "map");
-        
+
         return "map";
     }
 
@@ -88,6 +102,7 @@ public class MapController {
         public Double lat;
         public Double longitude;
         public Double radius;
+        public Boolean cluster;
 
         public QueryAttrs() {
         }
@@ -124,11 +139,20 @@ public class MapController {
             this.radius = radius;
         }
 
-        QueryAttrs(String type, Double lat, Double longitude, Double radius) {
+        public Boolean getCluster() {
+            return cluster;
+        }
+
+        public void setCluster(Boolean cluster) {
+            this.cluster = cluster;
+        }
+
+        QueryAttrs(String type, Double lat, Double longitude, Double radius, Boolean cluster) {
             this.type = type;
             this.lat = lat;
             this.longitude = longitude;
             this.radius = radius;
+            this.cluster = cluster;
         }
     }
 

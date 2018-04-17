@@ -15,4 +15,16 @@ public class PlaceCluster {
         this.latPos = latPos;
         this.longPos = longPos;
     }
+
+    public int getPlacesCount() {
+        return placesCount;
+    }
+
+    public double getLatPos() {
+        return latPos;
+    }
+
+    public double getLongPos() {
+        return longPos;
+    }
 }
