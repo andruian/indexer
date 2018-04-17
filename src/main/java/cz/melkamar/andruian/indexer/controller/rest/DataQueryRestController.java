@@ -70,5 +70,13 @@ public class DataQueryRestController {
             this.responseType = responseType;
             this.responseBody = responseBody;
         }
+
+        public int getResponseType() {
+            return responseType;
+        }
+
+        public Object getResponseBody() {
+            return responseBody;
+        }
     }
 }
