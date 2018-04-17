@@ -26,4 +26,28 @@ public class Util {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
+
+    public static class Rect {
+        public final double minX;
+        public final double minY;
+        public final double maxX;
+        public final double maxY;
+
+        public Rect(double minX, double minY, double maxX, double maxY) {
+            this.minX = minX;
+            this.minY = minY;
+            this.maxX = maxX;
+            this.maxY = maxY;
+        }
+    }
+
+    public static class LatLng {
+        public final double lat;
+        public final double lng;
+
+        public LatLng(double lat, double lng) {
+            this.lat = lat;
+            this.lng = lng;
+        }
+    }
 }

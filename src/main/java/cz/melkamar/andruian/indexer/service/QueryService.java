@@ -1,6 +1,7 @@
 package cz.melkamar.andruian.indexer.service;
 
 import cz.melkamar.andruian.indexer.dao.PlaceDAO;
+import cz.melkamar.andruian.indexer.exception.NotImplementedException;
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
 import cz.melkamar.andruian.indexer.model.place.Place;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class QueryService {
     public List<Place> query(@Nullable String type, @Nullable Double latitude, @Nullable Double longitude, @Nullable Double radius)
             throws QueryFormatException {
         LOGGER.debug("Executing query: type {} | pos {} {} | rad {}", type, latitude, longitude, radius);
-        
+
         List<Place> data;
         if (type == null || type.isEmpty()){
             if (checkLatLongR(latitude, longitude, radius)) data = placeDAO.getPlacesAroundPoint(latitude, longitude, radius);
@@ -37,6 +38,12 @@ public class QueryService {
 
         LOGGER.trace("Query complete. Returning "+data.size());
         return data;
+    }
+
+    public List<Place> clusteredQuery(@Nullable String type, @Nullable Double latitude, @Nullable Double longitude, @Nullable Double radius)
+            throws QueryFormatException {
+        LOGGER.debug("Executing clustered query: type {} | pos {} {} | rad {}", type, latitude, longitude, radius);
+        throw new NotImplementedException();
     }
 
     private boolean checkLatLongR(Double latitude, Double longitude, Double radius) throws QueryFormatException {
