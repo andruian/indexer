@@ -1,7 +1,7 @@
 FROM openjdk:8-jdk
 COPY ./ /indexer-build
 WORKDIR /indexer-build
-RUN cp /indexer-build/src/main/resources/application.properties /indexer-build/src/main/resources/application.properties && \
+RUN cp /indexer-build/docker/application.properties /indexer-build/src/main/resources/application.properties && \
     ./gradlew bootJar                         && \
     rm -rf /root/.gradle                      && \
     mkdir -p /indexer                         && \
