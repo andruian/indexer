@@ -17,6 +17,9 @@ public class IndexerConfiguration {
     public static final String MAX_POINTS_SHOWN = "ui.maxPointsShown";
     public static final String LOGGING_FILE = "logging.file";
 
+    //https://lucene.apache.org/solr/guide/6_6/spatial-search.html
+    public static final String CLUSTERING_DIST_ERR_PCT = "clustering.distErrPct";
+
     @Value("${" + INDEX_CRON + ":#{null}}")
     private String indexingCron;
 
@@ -38,6 +41,9 @@ public class IndexerConfiguration {
 
     @Value("${" + LOGGING_FILE + "}")
     private String loggingFile;
+
+    @Value("${" + CLUSTERING_DIST_ERR_PCT + "}")
+    private double clusteringDistErrPct;
 
     public String getLoggingFile() {
         return loggingFile;
@@ -69,5 +75,9 @@ public class IndexerConfiguration {
 
     public String getAdminPassword() {
         return adminPassword;
+    }
+
+    public double getClusteringDistErrPct() {
+        return clusteringDistErrPct;
     }
 }

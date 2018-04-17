@@ -31,7 +31,7 @@ public class ClusteredPlaceDAO {
     public List<PlaceCluster> getAllPlaces() {
         LOGGER.debug("Cluster | Fetching all places");
         List<PlaceCluster> result = new ArrayList<>();
-        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection(), configuration.getClusteringDistErrPct())
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
 
@@ -42,7 +42,7 @@ public class ClusteredPlaceDAO {
     public List<PlaceCluster> getPlacesOfClass(String classUri) {
         LOGGER.debug("Cluster | Fetching places of type " + classUri);
         List<PlaceCluster> result = new ArrayList<>();
-        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection(), configuration.getClusteringDistErrPct())
                 .setType(classUri)
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
@@ -54,7 +54,7 @@ public class ClusteredPlaceDAO {
     public List<PlaceCluster> getPlacesAroundPoint(double latCoord, double longCoord, double radius) {
         LOGGER.debug("Cluster | getPlacesAroundPoint {} {} {}", latCoord, longCoord, radius);
         List<PlaceCluster> result = new ArrayList<>();
-        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection(), configuration.getClusteringDistErrPct())
                 .setLocation(latCoord, longCoord, radius)
                 .build();
         LOGGER.debug("Cluster | Using query: " + query);
@@ -69,7 +69,7 @@ public class ClusteredPlaceDAO {
                                                           double radius) {
         LOGGER.debug("Cluster | getPlacesAroundPointOfClass {} {} {} {}", classUri, latCoord, longCoord, radius);
         List<PlaceCluster> result = new ArrayList<>();
-        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection())
+        String query = new ClusterQueryBuilder(configuration.getDbSolrUri(), configuration.getDbSolrCollection(), configuration.getClusteringDistErrPct())
                 .setLocation(latCoord, longCoord, radius)
                 .setType(classUri)
                 .build();

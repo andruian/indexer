@@ -10,6 +10,7 @@ public class ClusterQueryBuilder {
     private Double lat = null;
     private Double lng = null;
     private Double radius = null; // km
+    private double distErrPct = 0.50;
 
     /**
      * @param solrUrl
@@ -18,6 +19,16 @@ public class ClusterQueryBuilder {
     public ClusterQueryBuilder(String solrUrl, String collection) {
         this.solrUrl = solrUrl;
         this.collection = collection;
+    }
+
+    /**
+     * @param solrUrl
+     * @param collection
+     */
+    public ClusterQueryBuilder(String solrUrl, String collection, double distErrPct) {
+        this.solrUrl = solrUrl;
+        this.collection = collection;
+        this.distErrPct = distErrPct;
     }
 
     public ClusterQueryBuilder setType(String type) {
@@ -50,6 +61,7 @@ public class ClusterQueryBuilder {
 
         builder.queryParam("facet.heatmap", "location");
         builder.queryParam("facet", "true");
+        builder.queryParam("facet.heatmap.distErrPct", String.valueOf(distErrPct));
 
         // Spatial-bounded
         if (lat != null) {
