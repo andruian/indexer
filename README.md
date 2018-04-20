@@ -16,6 +16,9 @@ application.properties indexer-1.0.0.jar
 /some/path$ java -jar indexer-1.0.0.jar 
 ```
 
+## Documentation
+[JavaDoc available here](https://andruian.github.io/indexer/)
+
 ## Publishing a new version
 - Edit the version in [build.gradle](build.gradle)
 - Build the JAR
