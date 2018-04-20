@@ -118,7 +118,7 @@ public class ClusteredPlaceDAO {
 
     /**
      * Parse the response of a cluster/heatmap query from Solr. An example of the query format is provided
-     * in the test class {@link cz.melkamar.andruian.indexer.dao.ClusteredPlaceDAOTest}.
+     * in the test class ClusteredPlaceDAOTest.
      *
      * The response does not directly return GPS locations of the clusters. Instead, it divides the rectangle
      * that is being searched into an orthogonal grid and returns the number of columns and rows of such grid.

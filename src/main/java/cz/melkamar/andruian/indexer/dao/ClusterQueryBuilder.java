@@ -70,13 +70,13 @@ public class ClusterQueryBuilder {
      * The query may look like the following:
      * <pre>
      * http://localhost:8983/solr/andruian/select?
-     * d=2000 &
-     * facet.heatmap.geom=[%2214.411%2050.0%22%20TO%20%2214.412%2050.01%22] &
-     * facet.heatmap.gridLevel=6 &
-     * facet.heatmap=location &
-     * facet=true &
-     * fq={!bbox%20sfield=location} &
-     * pt=50.052828,14.439898 &
+     * d=2000 &amp;
+     * facet.heatmap.geom=[%2214.411%2050.0%22%20TO%20%2214.412%2050.01%22] &amp;
+     * facet.heatmap.gridLevel=6 &amp;
+     * facet.heatmap=location &amp;
+     * facet=true &amp;
+     * fq={!bbox%20sfield=location} &amp;
+     * pt=50.052828,14.439898 &amp;
      * q=type:%22http://example.org/SourceObjectA%22
      * </pre>
      *

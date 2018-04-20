@@ -1,0 +1,13 @@
+cz.melkamar.andruian.indexer
+cz.melkamar.andruian.indexer.config
+cz.melkamar.andruian.indexer.controller
+cz.melkamar.andruian.indexer.controller.rest
+cz.melkamar.andruian.indexer.controller.ui
+cz.melkamar.andruian.indexer.dao
+cz.melkamar.andruian.indexer.exception
+cz.melkamar.andruian.indexer.model
+cz.melkamar.andruian.indexer.model.place
+cz.melkamar.andruian.indexer.net
+cz.melkamar.andruian.indexer.rdf
+cz.melkamar.andruian.indexer.service
+cz.melkamar.andruian.indexer.thirdparty
