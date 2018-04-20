@@ -13,6 +13,11 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * A helper class for fetching a remote RDF file and parsing it into POJOs.
+ *
+ * The <a href="https://github.com/andruian/datadef-parser">ddfparser library</a> is used to parse the file.
+ */
 @Component
 public class DataDefFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDefFetcher.class);

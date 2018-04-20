@@ -9,6 +9,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+/**
+ * A helper class for network-related functionality - HTTP requests.
+ */
 @Component
 public class NetHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(NetHelper.class);

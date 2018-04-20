@@ -16,10 +16,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A service facilitating SPARQL communication with endpoints.
+ *
+ * TODO change this class to use RDF4J, since the datadefparser library brings that dependency with itself anyway. No reason to use both Jena and RDF4J.
+ */
 @Service
 public class SparqlConnector {
     private static final Logger LOGGER = LoggerFactory.getLogger(SparqlConnector.class);
 
+    /**
+     * Execute an indexing query and return the response data as a list of {@link Place} objects.
+     * @param datadefIri The IRI of the data definition associated with the index query.
+     * @param queryStr The full SPARQL query.
+     * @param sparqlEndpoint The URL of the SPARQL endpoint where to send the query.
+     * @param selectProperties A list of names of "select properties" which will be returned with the query
+     *                         and should be saved with the returned objects.
+     * @return A list of {@link Place} objects returned by the SPARQL endpoint.
+     * @throws SparqlQueryException if, for any reason, the indexing failed.
+     */
     public List<Place> executeIndexQuery(String datadefIri, String queryStr, String sparqlEndpoint, String[] selectProperties)
             throws SparqlQueryException {
         Query query = QueryFactory.create(queryStr);
@@ -43,6 +58,13 @@ public class SparqlConnector {
         return resultList;
     }
 
+    /**
+     * Construct a {@link Place} object from a single "line" of the indexing query result.
+     * @param datadefIri The IRI of the data definition the place is described by.
+     * @param querySolution The {@link QuerySolution} object describing the place in RDF.
+     * @param selectProperties A list of extra properties to look for in the query result and save with the {@link Place} object.
+     * @return A {@link Place} corresponding to the query result.
+     */
     Place placeFromQueryResult(String datadefIri, QuerySolution querySolution, String[] selectProperties) {
         String dataObjUri = querySolution.getResource("dataObj").toString();
         String locationObjUri = querySolution.getResource("locationObj").toString();
