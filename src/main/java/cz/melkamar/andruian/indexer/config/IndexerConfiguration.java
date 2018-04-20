@@ -3,6 +3,9 @@ package cz.melkamar.andruian.indexer.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * A provider of all indexer configuration, read from the application.properties file.
+ */
 @Component
 public class IndexerConfiguration {
     public static final String INDEX_CRON = "indexing.cron";

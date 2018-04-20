@@ -39,6 +39,13 @@ public class AdminRestController {
     }
 
 
+    /**
+     * An endpoint method that reindexes one or more data definitions stored in the system.
+     *
+     * @param dataDefUri  The URL of an RDF file which contains one or more data definitions to be reindexed.
+     * @param fullReindex If true, existing data for all data definitions found in the dataDefUri will be dropped before being reindexed.
+     * @return Plain string describing what happened.
+     */
     @PostMapping("reindex")
     public String reindex(@RequestParam(value = "dataDefUri", required = false, defaultValue = "") String dataDefUri,
                           @RequestParam(value = "fullReindex", required = false, defaultValue = "0") boolean fullReindex) {
@@ -57,18 +64,20 @@ public class AdminRestController {
                 return e.toString();
             }
         } else {
-            // TODO Display GUI?
-            // TODO at least list available URIs
             indexService.reindexAll(fullReindex);
             return "Refreshing all.";
         }
     }
 
+    /**
+     * An endpoint method that returns the contents of the application log.
+     * @return The contents of the application log wrapped in &lt;pre&gt; HTML tag.
+     */
     @GetMapping("log")
     public String log() {
         try {
             String logStr = Util.readFile(indexerConfiguration.getLoggingFile(), StandardCharsets.UTF_8);
-            return "<pre>"+logStr+"</pre>";
+            return "<pre>" + logStr + "</pre>";
         } catch (IOException e) {
             e.printStackTrace();
             return "Log file not found.";

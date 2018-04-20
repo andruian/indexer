@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Show map with pointers.
+ * A controller for the map view page.
  */
 @Controller
 public class MapController {
@@ -36,6 +36,9 @@ public class MapController {
         Util.addPrincipalAttribute(model);
     }
 
+    /**
+     * An endpoint method for showing the map page without any objects in it.
+     */
     @GetMapping("/")
     public String mainPage(Model model) {
         model.addAttribute("queryAttrs", new QueryAttrs(null, null, null, null, false));
@@ -44,6 +47,18 @@ public class MapController {
         return "map";
     }
 
+    /**
+     * An endpoint method for showing the map and objects according to a search query. The query parameters are
+     * almost identical to those of {@link cz.melkamar.andruian.indexer.controller.rest.DataQueryRestController#query(String, Double, Double, Double, boolean, Integer)}.
+     *
+     * @param type
+     * @param latitude
+     * @param longitude
+     * @param radius
+     * @param cluster If true, cluster results. If false, show markers for all results without clustering.
+     * @param model
+     * @return
+     */
     @GetMapping("/show")
     public String showMap(@RequestParam(value = "type", required = false) String type,
                           @RequestParam(value = "lat", required = false) Double latitude,
@@ -97,6 +112,9 @@ public class MapController {
         }
     }
 
+    /**
+     * A wrapper class for all the data filled into the form for searching through objects and showing them on the map.
+     */
     class QueryAttrs {
         public String type;
         public Double lat;

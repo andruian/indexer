@@ -23,13 +23,61 @@ public class DataQueryRestController {
     }
 
     /**
-     * @param type
-     * @param latitude     gps
-     * @param longitude    gps
-     * @param radius       kilometers
-     * @param showCount
-     * @param clusterLimit
-     * @return
+     * An endpoint method for querying data. The data is returned as JSON.
+     *
+     * The returned data may be of different types. The type is specified by an ID under responseType key. The actual
+     * data is provided under the responseBody key.
+     *
+     * By default a list of places is returned, e.g
+     * <pre>
+     * {
+     *   "responseType": 1,
+     *   "responseBody": [
+     *     {
+     *       "iri": "http://src.com/consonant/https%3A%2F%2Fruian.linked.opendata.cz%2Fzdroj%2Fadresní-místa%2F22655883",
+     *       "type": "http://example.org/SourceObjectConsonant",
+     *       "locationObjectIri": "https://ruian.linked.opendata.cz/zdroj/adresní-místa/22655883",
+     *       "label": "Holandská 18",
+     *       "properties": {
+     *         "StreetName": "Holandská",
+     *         "PSC": "10100",
+     *         "StreetNum": "18"
+     *       },
+     *       "latPos": 50.069716,
+     *       "longPos": 14.454531
+     *     },
+     *     ...
+     *   ]
+     * }
+     * </pre>
+     *
+     * If clustering is enabled and activated, the response body will contain a list of clusters - the position
+     * and number of places belonging to each cluster, like this:
+     * <pre>
+     * {
+     *   "responseType": 2,
+     *   "responseBody": [
+     *     {
+     *       "placesCount": 1,
+     *       "latPos": 50.07072687149048,
+     *       "longPos": 14.455454349517822
+     *     },
+     *     ...
+     *   ]
+     * }
+     * </pre>
+     *
+     * @param type         The IRI of the RDF class to search for. If not provided, objects of all classes are returned.
+     * @param latitude     The latitude around which to search for objects. Specified as floating-point coordinate
+     *                     using the WGS84 system. Either none or all of latitude, longitude and radius must be provided.
+     * @param longitude    The longitude around which to search for objects. Specified as floating-point coordinate
+     *                     using the WGS84 system. Either none or all of latitude, longitude and radius must be provided.
+     * @param radius       The radius of the circle, centered on the given lat long coordinates, in which to search
+     *                     for objects. The unit is kilometers. Either none or all of latitude, longitude and radius must be provided.
+     * @param showCount    If true, only return the number of matching objects, without the actual object data.
+     * @param clusterLimit The maximum number of places to return without clustering. If provided and the number of
+     *                     places to be returned is higher than this number, clusters will be returned instead.
+     * @return A JSON-serialized {@link QueryResponse} object describing the matching data.
      */
     @RequestMapping
     public Object query(
@@ -50,7 +98,7 @@ public class DataQueryRestController {
             }
 
             return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED,
-                                     queryService.clusteredQuery(type, latitude, longitude, radius));
+                    queryService.clusteredQuery(type, latitude, longitude, radius));
 
         } catch (QueryFormatException e) {
             e.printStackTrace();
@@ -58,9 +106,21 @@ public class DataQueryRestController {
         }
     }
 
+    /**
+     * A wrapper for the result of a query.
+     */
     static class QueryResponse {
+        /**
+         * The response contains only the number of matching places.
+         */
         public static final int RESPONSE_COUNT = 0;
+        /**
+         * The response contains places.
+         */
         public static final int RESPONSE_ALL = 1;
+        /**
+         * The response contains clusters of places.
+         */
         public static final int RESPONSE_CLUSTERED = 2;
 
         private final int responseType;
@@ -71,10 +131,16 @@ public class DataQueryRestController {
             this.responseBody = responseBody;
         }
 
+        /**
+         * The type of the response.
+         */
         public int getResponseType() {
             return responseType;
         }
 
+        /**
+         * The body of the response.
+         */
         public Object getResponseBody() {
             return responseBody;
         }
