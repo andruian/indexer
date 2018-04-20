@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * A service providing querying functionality. It communicates with the Data Access Objects to fetch
+ * data based on given parameters.
+ */
 @SuppressWarnings("Duplicates")
 @Service
 public class QueryService {
@@ -27,6 +31,19 @@ public class QueryService {
         this.clusteredPlaceDAO = clusteredPlaceDAO;
     }
 
+    /**
+     * Run a query and return matching data.
+     *
+     * @param type      The IRI of the RDF class to search for. If not provided, objects of all classes are returned.
+     * @param latitude  The latitude around which to search for objects. Specified as floating-point coordinate
+     *                  using the WGS84 system. Either none or all of latitude, longitude and radius must be provided.
+     * @param longitude The longitude around which to search for objects. Specified as floating-point coordinate
+     *                  using the WGS84 system. Either none or all of latitude, longitude and radius must be provided.
+     * @param radius    The radius of the circle, centered on the given lat long coordinates, in which to search
+     *                  for objects. The unit is kilometers. Either none or all of latitude, longitude and radius must be provided.
+     * @return A list of places that match the given query.
+     * @throws QueryFormatException The format of the query is invalid - likely because some but not all of latitude, longitude and radius were provided.
+     */
     public List<Place> query(@Nullable String type,
                              @Nullable Double latitude,
                              @Nullable Double longitude,
@@ -49,6 +66,19 @@ public class QueryService {
         return data;
     }
 
+    /**
+     * Run a query and return clusters of matching data.
+     *
+     * @param type      The IRI of the RDF class to search for. If not provided, objects of all classes are returned.
+     * @param latitude  The latitude around which to search for objects. Specified as floating-point coordinate
+     *                  using the WGS84 system. Either none or all of latitude, longitude and radius must be provided.
+     * @param longitude The longitude around which to search for objects. Specified as floating-point coordinate
+     *                  using the WGS84 system. Either none or all of latitude, longitude and radius must be provided.
+     * @param radius    The radius of the circle, centered on the given lat long coordinates, in which to search
+     *                  for objects. The unit is kilometers. Either none or all of latitude, longitude and radius must be provided.
+     * @return A list of clusters containing places that match the given query.
+     * @throws QueryFormatException The format of the query is invalid - likely because some but not all of latitude, longitude and radius were provided.
+     */
     public List<PlaceCluster> clusteredQuery(@Nullable String type,
                                              @Nullable Double latitude,
                                              @Nullable Double longitude,
@@ -71,6 +101,11 @@ public class QueryService {
         return data;
     }
 
+    /**
+     * Checks that either none or all of latitude, longitude and radius are provided.
+     * @return True if none or all parametres are non-null.
+     * @throws QueryFormatException When one or more, but not all parameters are provided.
+     */
     private boolean checkLatLongR(Double latitude, Double longitude, Double radius) throws QueryFormatException {
         if (latitude == null && longitude == null && radius == null) return false;
         if (latitude != null && longitude != null && radius != null) return true;

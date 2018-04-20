@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * A builder for an indexing SPARQL query. The query is based off a template which is provided in the project's
+ * resources under {@link IndexSparqlQueryBuilder#TEMPLATE_PATH}.
+ */
 public class IndexSparqlQueryBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexSparqlQueryBuilder.class);
     public static final String TEMPLATE_PATH = "templates/sparql/indexquery.sparql";

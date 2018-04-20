@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * A cron-based trigger for repeated timed tasks, e.g. reindexing.
+ */
 @Service
 @ConditionalOnProperty(IndexerConfiguration.INDEX_CRON)
 public class IndexCron {

@@ -23,6 +23,5 @@ public class IndexerApplication {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        System.exit(0);
     }
 }

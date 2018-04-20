@@ -58,10 +58,11 @@ public class IndexService {
      * location objects and position coordinates (via a federated query, those objects may be accessible through a
      * different controller - in the prototype version this will be the RÚIAN SPARQL controller).
      *
+     * The indexing is run asynchronously by delegating the method call to {@link IndexServiceAsyncCall#indexDataDefAsync(DataDef, boolean)}.
+     *
      * @param dataDef     A definition of the data.
      * @param fullReindex If true, reindex everything. If false, skip querying of objects already indexed (incremental
      *                    reindex).
-     * @return TODO: maybe no return value is even necessary?
      */
     public void indexDataDef(DataDef dataDef, boolean fullReindex) {
         CompletableFuture future = indexingJobs.get(dataDef);
@@ -72,12 +73,20 @@ public class IndexService {
         indexingJobs.put(dataDef, indexServiceAsyncCall.indexDataDefAsync(dataDef, fullReindex));
     }
 
+    /**
+     * Get all indexing jobs that are currently running.
+     *
+     * A running job is a {@link java.util.concurrent.Future} that is present in the indexingJobs collection and does
+     * not give any return value (returns null). That means its execution has not ended yet.
+     *
+     * @return A list of {@link DataDef} objects that are currently being indexed.
+     */
     public List<DataDef> getRunningJobs() {
         List<DataDef> result = new ArrayList<>();
         for (Map.Entry<DataDef, CompletableFuture> futureEntry : indexingJobs.entrySet()) {
             try {
                 if (futureEntry.getValue().getNow(null) == null) result.add(futureEntry.getKey());
-            } catch (Exception  e) {
+            } catch (Exception e) {
                 LOGGER.trace("getRunningJobs - " + futureEntry.getKey() + " ended with exception " + e.getMessage());
             }
         }
@@ -86,6 +95,9 @@ public class IndexService {
         return result;
     }
 
+    /**
+     * A wrapper for the result of an indexing job.
+     */
     public static class FinishedJobReport {
         public final DataDef dataDef;
         public final int indexedCount;
@@ -96,12 +108,19 @@ public class IndexService {
         }
     }
 
+    /**
+     * Get all indexing jobs that have finished and have not yet been read. Remove all finished jobs from the pool.
+     *
+     * Once a job finishes, it stays in the pool and waits to be read, quite like a message in a message queue system.
+     *
+     * @return A list of {@link FinishedJobReport} objects describing the result of all finished jobs.
+     */
     public List<FinishedJobReport> getFinishedJobs() {
         List<FinishedJobReport> result = new ArrayList<>();
         for (Map.Entry<DataDef, CompletableFuture> futureEntry : indexingJobs.entrySet()) {
             try {
                 Object indexedCount = futureEntry.getValue().getNow(null);
-                if (indexedCount != null){
+                if (indexedCount != null) {
                     result.add(new FinishedJobReport(futureEntry.getKey(), (Integer) indexedCount));
                 }
             } catch (CancellationException | CompletionException e) {
@@ -118,6 +137,13 @@ public class IndexService {
         return result;
     }
 
+    /**
+     * Get all indexing jobs that have finished with an exception. Remove all errored jobs from the pool.
+     *
+     * Once a job finishes, it stays in the pool and waits to be read, quite like a message in a message queue system.
+     *
+     * @return A map with {@link DataDef} as keys to the {@link Exception} that caused the job to fail.
+     */
     public Map<DataDef, Exception> getErroredJobs() {
         Map<DataDef, Exception> result = new HashMap<>();
 
@@ -140,7 +166,13 @@ public class IndexService {
     }
 
 
-
+    /**
+     * Reindex all data definitions that are present in the system.
+     *
+     * @param fullReindex If true, drop all existing data before indexing. If false, the indexing is done incrementally.
+     *                    That means that the SPARQL index query will filter out IRIs of all objects that are already
+     *                    indexed.
+     */
     public void reindexAll(boolean fullReindex) {
         LOGGER.warn("Reindexing...");
 
@@ -160,14 +192,36 @@ public class IndexService {
         }
     }
 
+    /**
+     * Delete all indexed data of the given data definition.
+     *
+     * @param dataDefIri The IRI of the data definition whose data to drop.
+     */
     public void dropData(String dataDefIri) {
         placeDAO.deletePlacesOfDataDefIri(dataDefIri);
     }
 
+    /**
+     * Get the number of places indexed for the given data definition.
+     *
+     * @param dataDefIri The IRI of the data definition for which to count its data points.
+     * @return The number of places belonging to the data definition.
+     */
     public int getIndexedPlacesCount(String dataDefIri) {
         return placeDAO.getDatadefPlacesCount(dataDefIri);
     }
 
+    /**
+     * Add a new data definition file to the system. The file must be a RDF file in the Turtle format.
+     * The file is parsed and all data definitions it contains are added
+     * to the system for indexing.
+     *
+     * @param dataDefFileUrl The URL pointing to the RDF file.
+     * @throws RdfFormatException     When the file cannot be parsed as a RDF file.
+     * @throws IOException            General read exception.
+     * @throws DataDefFormatException When the file can be parsed as a RDF file, but does not conform to the structure
+     *                                prescribed by the data definition schema.
+     */
     public void addDatadefFile(String dataDefFileUrl) throws RdfFormatException, IOException, DataDefFormatException {
         List<DataDef> dataDefs = dataDefFetcher.getDataDefsFromUri(dataDefFileUrl);
         datadefFileRepository.insert(new DataDefFile(dataDefFileUrl, dataDefs.stream().map(DataDef::getUri).collect(Collectors.toList())));
