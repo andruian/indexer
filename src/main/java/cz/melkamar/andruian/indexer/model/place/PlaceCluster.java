@@ -3,7 +3,9 @@ package cz.melkamar.andruian.indexer.model.place;
 /**
  * A class representing a cluster of Places generated server-side.
  *
- * There is no source datadef because Solr heatmap does not return them.
+ * There is no source datadef attached to it because Solr heatmap does not provide them.
+ * If it is necessary to know it, it is up to the consumer to pair the response with the data definition
+ * that was used when creating the query.
  */
 public class PlaceCluster {
     private final int placesCount;

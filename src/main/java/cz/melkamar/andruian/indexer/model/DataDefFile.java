@@ -4,6 +4,9 @@ import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
+/**
+ * A data definition file. It may contain one or more data definitions and is located at an URL.
+ */
 public class DataDefFile {
     @Id
     private String fileUrl;
