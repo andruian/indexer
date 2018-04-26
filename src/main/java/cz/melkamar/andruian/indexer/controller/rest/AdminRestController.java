@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -77,7 +78,7 @@ public class AdminRestController {
     public String log() {
         try {
             String logStr = Util.readFile(indexerConfiguration.getLoggingFile(), StandardCharsets.UTF_8);
-            return "<pre>" + logStr + "</pre>";
+            return "<pre>" + HtmlUtils.htmlEscape(logStr) + "</pre>";
         } catch (IOException e) {
             e.printStackTrace();
             return "Log file not found.";
