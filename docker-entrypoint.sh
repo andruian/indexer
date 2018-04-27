@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd /indexer
-java -jar indexer*.jar
+java -jar ${JVM_ARGS} indexer*.jar
