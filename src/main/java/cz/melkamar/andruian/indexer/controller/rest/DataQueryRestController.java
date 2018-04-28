@@ -1,7 +1,7 @@
 package cz.melkamar.andruian.indexer.controller.rest;
 
 import cz.melkamar.andruian.indexer.exception.QueryFormatException;
-import cz.melkamar.andruian.indexer.model.place.Place;
+import cz.melkamar.andruian.indexer.model.place.PlaceCluster;
 import cz.melkamar.andruian.indexer.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,7 +77,6 @@ public class DataQueryRestController {
      * @param showCount    If true, only return the number of matching objects, without the actual object data.
      * @param clusterLimit The maximum number of places to return without clustering. If provided and the number of
      *                     places to be returned is higher than this number, clusters will be returned instead.
-     * @param forceCluster If true, return clustered places without even counting them first (which may be slow in some cases).
      * @return A JSON-serialized {@link QueryResponse} object describing the matching data.
      */
     @RequestMapping
@@ -87,25 +86,25 @@ public class DataQueryRestController {
             @RequestParam(value = "long", required = false) Double longitude,
             @RequestParam(value = "r", required = false) Double radius,
             @RequestParam(value = "count", required = false) boolean showCount,
-            @RequestParam(value = "clusterLimit", required = false) Integer clusterLimit,
-            @RequestParam(value = "forceCluster", required = false) Boolean forceCluster
+            @RequestParam(value = "clusterLimit", required = false) Integer clusterLimit
     ) {
         try {
-            if (forceCluster != null && forceCluster){
-                return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED,
-                    queryService.clusteredQuery(type, latitude, longitude, radius));
+            if (!showCount && (clusterLimit == null || clusterLimit == 0)) {
+                return new QueryResponse(QueryResponse.RESPONSE_ALL, queryService.query(type, latitude, longitude, radius));
             }
 
-            List<Place> places = queryService.query(type, latitude, longitude, radius);
-            if (showCount) return new QueryResponse(QueryResponse.RESPONSE_COUNT, places.size());
+            // Calculate places count using clustered query - very quick
+            List<PlaceCluster> clusters = queryService.clusteredQuery(type, latitude, longitude, radius);
+            long placesCount = clusters.stream().mapToLong(PlaceCluster::getPlacesCount).sum();
+
+            if (showCount) return new QueryResponse(QueryResponse.RESPONSE_COUNT, placesCount);
 
             // No clustering limit set or number of places lower than the limit
-            if (clusterLimit == null || places.size() <= clusterLimit) {
-                return new QueryResponse(QueryResponse.RESPONSE_ALL, places);
+            if (clusterLimit == null || placesCount <= clusterLimit) {
+                return new QueryResponse(QueryResponse.RESPONSE_ALL, queryService.query(type, latitude, longitude, radius));
+            } else {
+                return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED, clusters);
             }
-
-            return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED,
-                    queryService.clusteredQuery(type, latitude, longitude, radius));
 
         } catch (QueryFormatException e) {
             e.printStackTrace();
