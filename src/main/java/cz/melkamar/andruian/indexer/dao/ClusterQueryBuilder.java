@@ -57,8 +57,14 @@ public class ClusterQueryBuilder {
      * @return
      */
     public ClusterQueryBuilder setLocation(double lat, double lng, double radius) {
-        this.lat = lat;
-        this.lng = lng;
+        if (lat > 90) this.lat = lat - 180;
+        else if (lat < -90) this.lat = lat + 180;
+        else this.lat = lat;
+
+        if (lng > 180) this.lng = lng - 360;
+        else if (lng < -180) this.lng = lng + 360;
+        else this.lng = lng;
+
         this.radius = radius;
         return this;
     }
@@ -127,9 +133,28 @@ public class ClusterQueryBuilder {
         double latDelta = radius / 110.574;
         double lngDelta = radius / (111.320 * Math.cos(Math.toRadians(lat)));
 
+        double minX = lng - lngDelta;
+        double minY = lat - latDelta;
+        double maxX = lng + lngDelta;
+        double maxY = lat + latDelta;
+
+        if (minY > 90) minY = minY - 180;
+        else if (minY < -90) minY = minY + 180;
+
+        if (maxY > 90) maxY = maxY - 180;
+        else if (maxY < -90) maxY = maxY + 180;
+
+        if (minX > 180) minX = minX - 360;
+        else if (minX < -180) minX = minX + 360;
+
+        if (maxX > 180) maxX = maxX - 360;
+        else if (maxX < -180) maxX = maxX + 360;
+
         return new Util.Rect(
-                lng - lngDelta, lat - latDelta,
-                lng + lngDelta, lat + latDelta
+                Math.min(minX, maxX),
+                Math.min(minY, maxY),
+                Math.max(minX, maxX),
+                Math.max(minY, maxY)
         );
     }
 

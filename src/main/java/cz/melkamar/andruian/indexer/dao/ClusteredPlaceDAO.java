@@ -144,6 +144,10 @@ public class ClusteredPlaceDAO {
         double maxX = locationJson.getDouble(9);
         double minY = locationJson.getDouble(11);
         double maxY = locationJson.getDouble(13);
+
+        if (locationJson.isNull(15)){
+            return result;
+        }
         JSONArray counts = locationJson.getJSONArray(15);
 
         for (int row = 0; row < counts.length(); row++) {
