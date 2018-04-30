@@ -142,16 +142,11 @@ public class ClusterQueryBuilder {
         double maxX = lng + lngDelta;
         double maxY = lat + latDelta;
 
-        if (lngDelta > 180) {
-            minX = -180;
-            maxX = 180;
-        } else {
-            if (maxX > 180) maxX -= 360;
-            else if (maxX < -180) maxX += 360;
+        if (maxX > 180) maxX -= 360;
+        else if (maxX < -180) maxX += 360;
 
-            if (minX > 180) minX -= 360;
-            else if (minX < -180) minX += 360;
-        }
+        if (minX > 180) minX -= 360;
+        else if (minX < -180) minX += 360;
 
         if (latDelta > 90) {
             minY = -90;
@@ -164,12 +159,11 @@ public class ClusterQueryBuilder {
             else if (minY < -90) minY += 180;
         }
 
-        // TODO this will not work correctly when displaying a small rectangle that overflows lat/lng. But Solr requires that the bounding rectangle's left coordinate must be lower than its right ... ?!
         Util.Rect rect = new Util.Rect(
-                Math.max(minX, -180),
-                Math.max(minY, -90),
-                Math.min(maxX, 180),
-                Math.min(maxY, 90)
+                minX,
+                minY,
+                maxX,
+                maxY
         );
 
         LOGGER.debug("calculateBoundingRect(" + lat + "," + lng + "," + radius + ") - latD " + latDelta + ", lngD " + lngDelta + " >> " + rect);

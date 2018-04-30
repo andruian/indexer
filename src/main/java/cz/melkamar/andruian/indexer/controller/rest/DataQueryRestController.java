@@ -100,7 +100,7 @@ public class DataQueryRestController {
             if (showCount) return new QueryResponse(QueryResponse.RESPONSE_COUNT, placesCount);
 
             // No clustering limit set or number of places lower than the limit
-            if (clusterLimit == null || placesCount <= clusterLimit) {
+            if (clusterLimit == null || (placesCount <= clusterLimit && placesCount > 0)) {
                 return new QueryResponse(QueryResponse.RESPONSE_ALL, queryService.query(type, latitude, longitude, radius));
             } else {
                 return new QueryResponse(QueryResponse.RESPONSE_CLUSTERED, clusters);
