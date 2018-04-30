@@ -142,11 +142,16 @@ public class ClusterQueryBuilder {
         double maxX = lng + lngDelta;
         double maxY = lat + latDelta;
 
-        if (maxX > 180) maxX -= 360;
-        else if (maxX < -180) maxX += 360;
+        if (lngDelta > 180) {
+            minX = -180;
+            maxX = 180;
+        } else {
+            if (maxX > 180) maxX -= 360;
+            else if (maxX < -180) maxX += 360;
 
-        if (minX > 180) minX -= 360;
-        else if (minX < -180) minX += 360;
+            if (minX > 180) minX -= 360;
+            else if (minX < -180) minX += 360;
+        }
 
         if (latDelta > 90) {
             minY = -90;
