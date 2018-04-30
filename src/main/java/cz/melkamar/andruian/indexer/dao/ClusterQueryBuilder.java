@@ -1,6 +1,8 @@
 package cz.melkamar.andruian.indexer.dao;
 
 import cz.melkamar.andruian.indexer.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
@@ -10,6 +12,8 @@ import org.springframework.web.util.UriComponentsBuilder;
  * method for more information.
  */
 public class ClusterQueryBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterQueryBuilder.class);
+
     private final String solrUrl;
     private final String collection;
     private String type = null;
@@ -138,24 +142,39 @@ public class ClusterQueryBuilder {
         double maxX = lng + lngDelta;
         double maxY = lat + latDelta;
 
-        if (minY > 90) minY = minY - 180;
-        else if (minY < -90) minY = minY + 180;
+        if (lngDelta > 180) {
+            minX = -180;
+            maxX = 180;
+        } else {
+            if (maxX > 180) maxX -= 360;
+            else if (maxX < -180) maxX += 360;
 
-        if (maxY > 90) maxY = maxY - 180;
-        else if (maxY < -90) maxY = maxY + 180;
+            if (minX > 180) minX -= 360;
+            else if (minX < -180) minX += 360;
+        }
 
-        if (minX > 180) minX = minX - 360;
-        else if (minX < -180) minX = minX + 360;
+        if (latDelta > 90) {
+            minY = -90;
+            maxY = 90;
+        } else {
+            if (maxY > 90) maxY -= 180;
+            else if (maxY < -90) maxY += 180;
 
-        if (maxX > 180) maxX = maxX - 360;
-        else if (maxX < -180) maxX = maxX + 360;
+            if (minY > 90) minY -= 180;
+            else if (minY < -90) minY += 180;
+        }
 
-        return new Util.Rect(
-                Math.min(minX, maxX),
-                Math.min(minY, maxY),
-                Math.max(minX, maxX),
-                Math.max(minY, maxY)
+        // TODO this will not work correctly when displaying a small rectangle that overflows lat/lng. But Solr requires that the bounding rectangle's left coordinate must be lower than its right ... ?!
+        Util.Rect rect = new Util.Rect(
+                Math.max(minX, -180),
+                Math.max(minY, -90),
+                Math.min(maxX, 180),
+                Math.min(maxY, 90)
         );
+
+        LOGGER.debug("calculateBoundingRect(" + lat + "," + lng + "," + radius + ") - latD " + latDelta + ", lngD " + lngDelta + " >> " + rect);
+
+        return rect;
     }
 
 }
