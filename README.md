@@ -19,6 +19,12 @@ application.properties indexer-1.0.0.jar
 ## Documentation
 [JavaDoc available here](https://andruian.github.io/indexer/)
 
+## Building from source
+To create a runnable JAR file, run:
+```
+$ gradlew bootJar
+```
+
 ## Publishing a new version
 - Edit the version in [build.gradle](build.gradle)
 - Build the JAR
